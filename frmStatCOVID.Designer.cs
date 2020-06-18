@@ -43,8 +43,13 @@
             this.chkFileEsteso = new System.Windows.Forms.CheckBox();
             this.optPiacenza = new System.Windows.Forms.RadioButton();
             this.optEmiliaRomagna = new System.Windows.Forms.RadioButton();
+            this.optPiemonte = new System.Windows.Forms.RadioButton();
+            this.chkCFRefertante = new System.Windows.Forms.CheckBox();
+            this.txtCFRefertante = new System.Windows.Forms.TextBox();
+            this.pnlCFRefertante = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
+            this.pnlCFRefertante.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -76,7 +81,7 @@
             // cmdGeneraFile
             // 
             this.cmdGeneraFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmdGeneraFile.Location = new System.Drawing.Point(750, 71);
+            this.cmdGeneraFile.Location = new System.Drawing.Point(750, 168);
             this.cmdGeneraFile.Name = "cmdGeneraFile";
             this.cmdGeneraFile.Size = new System.Drawing.Size(213, 27);
             this.cmdGeneraFile.TabIndex = 3;
@@ -88,7 +93,7 @@
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.progressBar1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.progressBar1.Location = new System.Drawing.Point(0, 156);
+            this.progressBar1.Location = new System.Drawing.Point(0, 225);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(1086, 23);
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -127,7 +132,7 @@
             this.panel1.Controls.Add(this.lblFileOrigine);
             this.panel1.Location = new System.Drawing.Point(12, 14);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(730, 100);
+            this.panel1.Size = new System.Drawing.Size(730, 136);
             this.panel1.TabIndex = 7;
             // 
             // pnlTipoFile
@@ -166,7 +171,7 @@
             // chkFileEsteso
             // 
             this.chkFileEsteso.AutoSize = true;
-            this.chkFileEsteso.Location = new System.Drawing.Point(751, 100);
+            this.chkFileEsteso.Location = new System.Drawing.Point(751, 197);
             this.chkFileEsteso.Name = "chkFileEsteso";
             this.chkFileEsteso.Size = new System.Drawing.Size(141, 20);
             this.chkFileEsteso.TabIndex = 9;
@@ -177,7 +182,7 @@
             // 
             this.optPiacenza.AutoSize = true;
             this.optPiacenza.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optPiacenza.Location = new System.Drawing.Point(751, 44);
+            this.optPiacenza.Location = new System.Drawing.Point(751, 48);
             this.optPiacenza.Name = "optPiacenza";
             this.optPiacenza.Size = new System.Drawing.Size(100, 20);
             this.optPiacenza.TabIndex = 10;
@@ -189,18 +194,64 @@
             // 
             this.optEmiliaRomagna.AutoSize = true;
             this.optEmiliaRomagna.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optEmiliaRomagna.Location = new System.Drawing.Point(871, 44);
+            this.optEmiliaRomagna.Location = new System.Drawing.Point(871, 48);
             this.optEmiliaRomagna.Name = "optEmiliaRomagna";
             this.optEmiliaRomagna.Size = new System.Drawing.Size(154, 20);
             this.optEmiliaRomagna.TabIndex = 11;
             this.optEmiliaRomagna.Text = "EMILIA ROMAGNA";
             this.optEmiliaRomagna.UseVisualStyleBackColor = true;
+            this.optEmiliaRomagna.CheckedChanged += new System.EventHandler(this.optSede_CheckedChanged);
+            // 
+            // optPiemonte
+            // 
+            this.optPiemonte.AutoSize = true;
+            this.optPiemonte.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optPiemonte.Location = new System.Drawing.Point(751, 77);
+            this.optPiemonte.Name = "optPiemonte";
+            this.optPiemonte.Size = new System.Drawing.Size(104, 20);
+            this.optPiemonte.TabIndex = 12;
+            this.optPiemonte.Text = "PIEMONTE";
+            this.optPiemonte.UseVisualStyleBackColor = true;
+            this.optPiemonte.CheckedChanged += new System.EventHandler(this.optSede_CheckedChanged);
+            // 
+            // chkCFRefertante
+            // 
+            this.chkCFRefertante.AutoSize = true;
+            this.chkCFRefertante.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkCFRefertante.Location = new System.Drawing.Point(8, 18);
+            this.chkCFRefertante.Name = "chkCFRefertante";
+            this.chkCFRefertante.Size = new System.Drawing.Size(130, 20);
+            this.chkCFRefertante.TabIndex = 13;
+            this.chkCFRefertante.Text = "C.F. Refertante";
+            this.chkCFRefertante.UseVisualStyleBackColor = true;
+            // 
+            // txtCFRefertante
+            // 
+            this.txtCFRefertante.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtCFRefertante.Location = new System.Drawing.Point(144, 16);
+            this.txtCFRefertante.MaxLength = 16;
+            this.txtCFRefertante.Name = "txtCFRefertante";
+            this.txtCFRefertante.Size = new System.Drawing.Size(197, 22);
+            this.txtCFRefertante.TabIndex = 14;
+            this.txtCFRefertante.Text = "RSOLSN69M04G197A";
+            // 
+            // pnlCFRefertante
+            // 
+            this.pnlCFRefertante.Controls.Add(this.txtCFRefertante);
+            this.pnlCFRefertante.Controls.Add(this.chkCFRefertante);
+            this.pnlCFRefertante.Location = new System.Drawing.Point(12, 156);
+            this.pnlCFRefertante.Name = "pnlCFRefertante";
+            this.pnlCFRefertante.Size = new System.Drawing.Size(364, 63);
+            this.pnlCFRefertante.TabIndex = 15;
+            this.pnlCFRefertante.Visible = false;
             // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1086, 179);
+            this.ClientSize = new System.Drawing.Size(1086, 248);
+            this.Controls.Add(this.pnlCFRefertante);
+            this.Controls.Add(this.optPiemonte);
             this.Controls.Add(this.optEmiliaRomagna);
             this.Controls.Add(this.optPiacenza);
             this.Controls.Add(this.chkFileEsteso);
@@ -219,6 +270,8 @@
             this.panel1.ResumeLayout(false);
             this.pnlTipoFile.ResumeLayout(false);
             this.pnlTipoFile.PerformLayout();
+            this.pnlCFRefertante.ResumeLayout(false);
+            this.pnlCFRefertante.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -240,6 +293,10 @@
         private System.Windows.Forms.RadioButton optPiacenza;
         private System.Windows.Forms.Panel pnlTipoFile;
         private System.Windows.Forms.RadioButton optEmiliaRomagna;
+        private System.Windows.Forms.RadioButton optPiemonte;
+        private System.Windows.Forms.CheckBox chkCFRefertante;
+        private System.Windows.Forms.TextBox txtCFRefertante;
+        private System.Windows.Forms.Panel pnlCFRefertante;
     }
 }
 
