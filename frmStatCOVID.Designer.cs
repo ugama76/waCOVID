@@ -47,6 +47,7 @@
             this.chkCFRefertante = new System.Windows.Forms.CheckBox();
             this.txtCFRefertante = new System.Windows.Forms.TextBox();
             this.pnlCFRefertante = new System.Windows.Forms.Panel();
+            this.lblStato = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -93,7 +94,7 @@
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.progressBar1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.progressBar1.Location = new System.Drawing.Point(0, 225);
+            this.progressBar1.Location = new System.Drawing.Point(0, 248);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(1086, 23);
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -245,11 +246,20 @@
             this.pnlCFRefertante.TabIndex = 15;
             this.pnlCFRefertante.Visible = false;
             // 
+            // lblStato
+            // 
+            this.lblStato.AutoSize = true;
+            this.lblStato.Location = new System.Drawing.Point(9, 229);
+            this.lblStato.Name = "lblStato";
+            this.lblStato.Size = new System.Drawing.Size(0, 16);
+            this.lblStato.TabIndex = 16;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1086, 248);
+            this.ClientSize = new System.Drawing.Size(1086, 271);
+            this.Controls.Add(this.lblStato);
             this.Controls.Add(this.pnlCFRefertante);
             this.Controls.Add(this.optPiemonte);
             this.Controls.Add(this.optEmiliaRomagna);
@@ -297,6 +307,7 @@
         private System.Windows.Forms.CheckBox chkCFRefertante;
         private System.Windows.Forms.TextBox txtCFRefertante;
         private System.Windows.Forms.Panel pnlCFRefertante;
+        private System.Windows.Forms.Label lblStato;
     }
 }
 

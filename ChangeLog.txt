@@ -1,0 +1,2 @@
+﻿2.0.2 del 26/06/2020
+Fix modifiche Piemonte

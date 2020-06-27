@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace waCOVID
@@ -15,7 +17,9 @@ namespace waCOVID
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT", false);
             Application.Run(new frmStatCOVID());
         }
     }
 }
+

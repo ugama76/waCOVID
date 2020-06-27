@@ -1,0 +1,257 @@
+﻿Regione;Codice ISTAT;Denominazione IT;Denominazione EN;Codice AT;Provincia
+999;201;Albania;Albania;Z100;EE
+999;202;Andorra;Andorra;Z101;EE
+999;203;Austria;Austria;Z102;EE
+999;206;Belgio;Belgium;Z103;EE
+999;209;Bulgaria;Bulgaria;Z104;EE
+999;212;Danimarca;Denmark;Z107;EE
+999;214;Finlandia;Finland;Z109;EE
+999;215;Francia;France;Z110;EE
+999;216;Germania;Germany;Z112;EE
+999;219;Regno Unito;United Kingdom;Z114;EE
+999;220;Grecia;Greece;Z115;EE
+999;221;Irlanda;Ireland;Z116;EE
+999;223;Islanda;Iceland;Z117;EE
+999;225;Liechtenstein;Liechtenstein;Z119;EE
+999;226;Lussemburgo;Luxembourg;Z120;EE
+999;227;Malta;Malta;Z121;EE
+999;229;Monaco;Monaco;Z123;EE
+999;231;Norvegia;Norway;Z125;EE
+999;232;Paesi Bassi;Netherlands;Z126;EE
+999;233;Polonia;Poland;Z127;EE
+999;234;Portogallo;Portugal;Z128;EE
+999;235;Romania;Romania;Z129;EE
+999;236;San Marino;San Marino;Z130;EE
+999;239;Spagna;Spain;Z131;EE
+999;240;Svezia;Sweden;Z132;EE
+999;241;Svizzera;Switzerland;Z133;EE
+999;243;Ucraina;Ukraine;Z138;EE
+999;244;Ungheria;Hungary;Z134;EE
+999;245;Federazione russa;Russian Federation;Z154;EE
+999;246;Stato della Città del Vaticano;Vatican City State;Z106;EE
+999;247;Estonia;Estonia;Z144;EE
+999;248;Lettonia;Latvia;Z145;EE
+999;249;Lituania;Lithuania;Z146;EE
+999;250;Croazia;Croatia;Z149;EE
+999;251;Slovenia;Slovenia;Z150;EE
+999;252;Bosnia-Erzegovina;Bosnia and Herzegovina;Z153;EE
+999;253;Macedonia del Nord;North Macedonia;Z148;EE
+999;254;Moldova;Moldova;Z140;EE
+999;255;Slovacchia;Slovakia;Z155;EE
+999;256;Bielorussia;Belarus;Z139;EE
+999;257;Repubblica ceca;Czech Republic;Z156;EE
+999;270;Montenegro;Montenegro;Z159;EE
+999;271;Serbia;Serbia;Z158;EE
+999;272;Kosovo;Kosovo;Z160;EE
+999;301;Afghanistan;Afghanistan;Z200;EE
+999;302;Arabia Saudita;Saudi Arabia;Z203;EE
+999;304;Bahrein;Bahrain;Z204;EE
+999;305;Bangladesh;Bangladesh;Z249;EE
+999;306;Bhutan;Bhutan;Z205;EE
+999;307;Myanmar/Birmania;Myanmar/Burma;Z206;EE
+999;309;Brunei Darussalam;Brunei Darussalam;Z207;EE
+999;310;Cambogia;Cambodia;Z208;EE
+999;311;Sri Lanka;Sri Lanka;Z209;EE
+999;314;Cina;China;Z210;EE
+999;315;Cipro;Cyprus;Z211;EE
+999;319;Corea del Nord;North Korea;Z214;EE
+999;320;Corea del Sud;South Korea;Z213;EE
+999;322;Emirati Arabi Uniti;United Arab Emirates;Z215;EE
+999;323;Filippine;Philippines;Z216;EE
+999;324;Palestina;Palestine;Z161;EE
+999;326;Giappone;Japan;Z219;EE
+999;327;Giordania;Jordan;Z220;EE
+999;330;India;India;Z222;EE
+999;331;Indonesia;Indonesia;Z223;EE
+999;332;Iran;Iran;Z224;EE
+999;333;Iraq;Iraq;Z225;EE
+999;334;Israele;Israel;Z226;EE
+999;335;Kuwait;Kuwait;Z227;EE
+999;336;Laos;Laos;Z228;EE
+999;337;Libano;Lebanon;Z229;EE
+999;338;Timor Leste;Timor Leste;Z242;EE
+999;339;Maldive;Maldives;Z232;EE
+999;340;Malaysia;Malaysia;Z247;EE
+999;341;Mongolia;Mongolia;Z233;EE
+999;342;Nepal;Nepal;Z234;EE
+999;343;Oman;Oman;Z235;EE
+999;344;Pakistan;Pakistan;Z236;EE
+999;345;Qatar;Qatar;Z237;EE
+999;346;Singapore;Singapore;Z248;EE
+999;348;Siria;Syria;Z240;EE
+999;349;Thailandia;Thailand;Z241;EE
+999;351;Turchia;Turkey;Z243;EE
+999;353;Vietnam;Vietnam;Z251;EE
+999;354;Yemen;Yemen;Z246;EE
+999;356;Kazakhstan;Kazakhstan;Z255;EE
+999;357;Uzbekistan;Uzbekistan;Z259;EE
+999;358;Armenia;Armenia;Z252;EE
+999;359;Azerbaigian;Azerbaijan;Z253;EE
+999;360;Georgia;Georgia;Z254;EE
+999;361;Kirghizistan;Kyrgyzstan;Z256;EE
+999;362;Tagikistan;Tajikistan;Z257;EE
+999;363;Taiwan;Taiwan;Z217;EE
+999;364;Turkmenistan;Turkmenistan;Z258;EE
+999;401;Algeria;Algeria;Z301;EE
+999;402;Angola;Angola;Z302;EE
+999;404;Costa d'Avorio;Côte d'Ivoire;Z313;EE
+999;406;Benin;Benin;Z314;EE
+999;408;Botswana;Botswana;Z358;EE
+999;409;Burkina Faso;Burkina Faso;Z354;EE
+999;410;Burundi;Burundi;Z305;EE
+999;411;Camerun;Cameroon;Z306;EE
+999;413;Capo Verde;Cape Verde;Z307;EE
+999;414;Repubblica Centrafricana;Central African Republic;Z308;EE
+999;415;Ciad;Chad;Z309;EE
+999;417;Comore;Comoros;Z310;EE
+999;418;Congo;Congo;Z311;EE
+999;419;Egitto;Egypt;Z336;EE
+999;420;Etiopia;Ethiopia;Z315;EE
+999;421;Gabon;Gabon;Z316;EE
+999;422;Gambia;Gambia;Z317;EE
+999;423;Ghana;Ghana;Z318;EE
+999;424;Gibuti;Djibouti;Z361;EE
+999;425;Guinea;Guinea;Z319;EE
+999;426;Guinea-Bissau;Guinea-Bissau;Z320;EE
+999;427;Guinea equatoriale;Equatorial Guinea;Z321;EE
+999;428;Kenya;Kenya;Z322;EE
+999;429;Lesotho;Lesotho;Z359;EE
+999;430;Liberia;Liberia;Z325;EE
+999;431;Libia;Libya;Z326;EE
+999;432;Madagascar;Madagascar;Z327;EE
+999;434;Malawi;Malawi;Z328;EE
+999;435;Mali;Mali;Z329;EE
+999;436;Marocco;Morocco;Z330;EE
+999;437;Mauritania;Mauritania;Z331;EE
+999;438;Maurizio;Mauritius;Z332;EE
+999;440;Mozambico;Mozambique;Z333;EE
+999;441;Namibia;Namibia;Z300;EE
+999;442;Niger;Niger;Z334;EE
+999;443;Nigeria;Nigeria;Z335;EE
+999;446;Ruanda;Rwanda;Z338;EE
+999;448;Sao Tomé e Principe;Sao Tome and Principe;Z341;EE
+999;449;Seychelles;Seychelles;Z342;EE
+999;450;Senegal;Senegal;Z343;EE
+999;451;Sierra Leone;Sierra Leone;Z344;EE
+999;453;Somalia;Somalia;Z345;EE
+999;454;Sudafrica;South Africa;Z347;EE
+999;455;Sudan;Sudan;Z348;EE
+999;456;Eswatini;Eswatini;Z349;EE
+999;457;Tanzania;Tanzania;Z357;EE
+999;458;Togo;Togo;Z351;EE
+999;460;Tunisia;Tunisia;Z352;EE
+999;461;Uganda;Uganda;Z353;EE
+999;463;Repubblica Democratica del Congo;Democratic Republic of the Congo;Z312;EE
+999;464;Zambia;Zambia;Z355;EE
+999;465;Zimbabwe;Zimbabwe;Z337;EE
+999;466;Eritrea;Eritrea;Z368;EE
+999;467;Sud Sudan;South Sudan;Z907;EE
+999;503;Antigua e Barbuda;Antigua and Barbuda;Z532;EE
+999;505;Bahamas;Bahamas;Z502;EE
+999;506;Barbados;Barbados;Z522;EE
+999;507;Belize;Belize;Z512;EE
+999;509;Canada;Canada;Z401;EE
+999;513;Costa Rica;Costa Rica;Z503;EE
+999;514;Cuba;Cuba;Z504;EE
+999;515;Dominica;Dominica;Z526;EE
+999;516;Repubblica Dominicana;Dominican Republic;Z505;EE
+999;517;El Salvador;El Salvador;Z506;EE
+999;518;Giamaica;Jamaica;Z507;EE
+999;519;Grenada;Grenada;Z524;EE
+999;523;Guatemala;Guatemala;Z509;EE
+999;524;Haiti;Haiti;Z510;EE
+999;525;Honduras;Honduras;Z511;EE
+999;527;Messico;Mexico;Z514;EE
+999;529;Nicaragua;Nicaragua;Z515;EE
+999;530;Panama;Panama;Z516;EE
+999;532;Santa Lucia;Saint Lucia;Z527;EE
+999;533;Saint Vincent e Grenadine;Saint Vincent and the Grenadines;Z528;EE
+999;534;Saint Kitts e Nevis;Saint Kitts and Nevis;Z533;EE
+999;536;Stati Uniti d'America;United States of America;Z404;EE
+999;602;Argentina;Argentina;Z600;EE
+999;604;Bolivia;Bolivia;Z601;EE
+999;605;Brasile;Brazil;Z602;EE
+999;606;Cile;Chile;Z603;EE
+999;608;Colombia;Colombia;Z604;EE
+999;609;Ecuador;Ecuador;Z605;EE
+999;612;Guyana;Guyana;Z606;EE
+999;614;Paraguay;Paraguay;Z610;EE
+999;615;Perù;Peru;Z611;EE
+999;616;Suriname;Suriname;Z608;EE
+999;617;Trinidad e Tobago;Trinidad and Tobago;Z612;EE
+999;618;Uruguay;Uruguay;Z613;EE
+999;619;Venezuela;Venezuela;Z614;EE
+999;701;Australia;Australia;Z700;EE
+999;703;Figi;Fiji;Z704;EE
+999;708;Kiribati;Kiribati;Z731;EE
+999;712;Isole Marshall;Marshall Islands;Z711;EE
+999;713;Stati Federati di Micronesia;Federated States of Micronesia;Z735;EE
+999;715;Nauru;Nauru;Z713;EE
+999;719;Nuova Zelanda;New Zealand;Z719;EE
+999;720;Palau;Palau;Z734;EE
+999;721;Papua Nuova Guinea;Papua New Guinea;Z730;EE
+999;725;Isole Salomone;Solomon Islands;Z724;EE
+999;727;Samoa;Samoa;Z726;EE
+999;730;Tonga;Tonga;Z728;EE
+999;731;Tuvalu;Tuvalu;Z732;EE
+999;732;Vanuatu;Vanuatu;Z733;EE
+999;902;Nuova Caledonia;New Caledonia;Z716;EE
+999;904;Saint-Martin (FR);Saint Martin (FR);n.d.;EE
+999;905;Sahara occidentale;Western Sahara;Z339;EE
+999;906;Saint-Barthélemy;Saint Barthelemy;n.d.;EE
+999;908;Bermuda;Bermuda;Z400;EE
+999;909;Isole Cook (NZ);Cook Islands (NZ);Z703;EE
+999;910;Gibilterra;Gibraltar;Z113;EE
+999;911;Isole Cayman;Cayman Islands;Z530;EE
+999;917;Anguilla;Anguilla;Z529;EE
+999;920;Polinesia francese;French Polynesia;Z723;EE
+999;924;Isole Fær Øer;Faroe Islands;Z108;EE
+999;925;Jersey;Jersey;n.d.;EE
+999;926;Aruba;Aruba;Z501;EE
+999;928;Sint Maarten (NL);St Maarten (NL);n.d.;EE
+999;934;Groenlandia;Greenland;Z402;EE
+999;939;Sark;Sark;n.d.;EE
+999;940;Guernsey;Guernsey;n.d.;EE
+999;958;Isole Falkland (Malvine);Falkland Islands (Malvinas);Z609;EE
+999;959;Isola di Man;Isle of Man;Z122;EE
+999;964;Montserrat;Montserrat;Z531;EE
+999;966;Curaçao;Curaçao;n.d.;EE
+999;972;Isole Pitcairn;Pitcairn;Z722;EE
+999;980;Saint Pierre e Miquelon;Saint Pierre and Miquelon;Z403;EE
+999;983;Sant'Elena;Saint Helena;Z340;EE
+999;988;Terre australi e antartiche francesi;French Southern Territories;n.d.;EE
+999;992;Isole Turks e Caicos;Turks and Caicos Islands;Z519;EE
+999;994;Isole Vergini britanniche;British Virgin Islands;Z525;EE
+999;997;Wallis e Futuna;Wallis and Futuna Islands;Z729;EE
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
+;;;;;
