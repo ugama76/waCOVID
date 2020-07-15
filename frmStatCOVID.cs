@@ -26,9 +26,18 @@ namespace waCOVID
             EMILIA,
             PIEMONTE
         }
+        private enum enumTipoEsame
+        {
+            Tampone,
+            TestRapido,
+            IgG,
+            IgM,
+            IgA,
+            IgTot
+        }
         #endregion
 
-        #region COSTRUTTORE
+            #region COSTRUTTORE
         public frmStatCOVID()
         {
             InitializeComponent();
@@ -200,6 +209,7 @@ namespace waCOVID
                                         dtCsv.Columns.Add("BCP"); //add other columns
                                         dtCsv.Columns.Add("dt_richiesta"); //add other columns
                                         dtCsv.Columns.Add("cod_test"); //add other columns
+                                        dtCsv.Columns.Add("tipo_test"); //add other columns
                                         dtCsv.Columns.Add("Igm_ris"); //add other columns
                                         dtCsv.Columns.Add("Igg_ris"); //add other columns
                                         dtCsv.Columns.Add("es_ris"); //add other columns
@@ -217,22 +227,26 @@ namespace waCOVID
                                             dr[k] = rowValues[k].ToString().Trim();
                                         }
                                         tmpEsame = dr["Test_utilizzato"].ToString();
-                                        if (dr["Risultato"].ToString() == "" && dr["RisDesc"].ToString() == "")
+                                        dr["cod_test"] = GetCUR(prmTipo, tmpEsame);
+                                        if (tmpEsame == "COVID")
                                         {
-                                            if (dr["Data Referto"].ToString() != "")
-                                                dr["Esito"] = "NEGATIVO";
-                                            else
-                                                dr["Esito"] = "IN CORSO";
+                                            //RNA
+                                            dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                            if (dr["Esito"].ToString().IndexOf("POSITIVO") != -1)
+                                                dr["es_ris"] = "pos";
+                                            else if (dr["Esito"].ToString().IndexOf("NEGATIVO") != -1)
+                                                dr["es_ris"] = "neg";
                                         }
                                         else
                                         {
-                                            if (tmpEsame == "COVID")
-                                                dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
-                                            else
-                                                dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                            //Sierologici
+                                            dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
                                         }
+                                        dr["tipo_test"] = GetCUR(prmTipo, tmpEsame, true);
                                         dr["BCP"] = GetLabRif(dr["Punto Accesso"].ToString()); //add other columns
                                         dr["dt_richiesta"] = dr["Data Accesso"];
+                                        dr["dt_val"] = dr["Data Referto"];
+                                        dr["cod_lab"] = "Lifebrain Emilia-Romagna S.r.l.";
                                         if (dr["id_richiesta"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
                                             dtCsv.Rows.Add(dr); //add other rows  
                                     }
@@ -338,7 +352,7 @@ namespace waCOVID
                                         else if (dr["Residenza"].ToString() != "")
                                         {
                                             dr["aslAppartenenza"] = GetASL(dr["Residenza"].ToString(), conn); //ASL paziente
-                                            if (dr["aslAppartenenza"].ToString() == "" && dr["Residenza"].ToString().Substring(0,3)=="999")
+                                            if (dr["aslAppartenenza"].ToString() == "" && dr["Residenza"].ToString().Substring(0, 3) == "999")
                                                 dr["aslAppartenenza"] = "213"; //Se non è stato in grado di trovarla e il paziente è straniero mette quella del laboratorio ASL Alessandria
                                         }
                                         dr["code"] = GetCUR(prmTipo, tmpEsame);
@@ -614,54 +628,112 @@ namespace waCOVID
             return tmpRis;
         }
         private string GetCUR(enumTipoTracciato prmTipo, string prmEsame)
+        { 
+            return GetCUR(prmTipo, prmEsame, false);
+        }
+        private string GetCUR(enumTipoTracciato prmTipo, string prmEsame, bool prmTipoEsame)
         {
             string tmpCodCUR = "";
             string tmpEsame = prmEsame.Substring(0, prmEsame.IndexOf(" "));
-            switch (prmTipo)
+            if (prmTipoEsame == false)
             {
-                case enumTipoTracciato.ATS:
-                    break;
-                case enumTipoTracciato.AUSLPC:
-                    break;
-                case enumTipoTracciato.EMILIA:
-                    break;
-                case enumTipoTracciato.PIEMONTE:
-                    switch (tmpEsame)
-                    {
-                        case "COVID": //Tampone
-                            tmpCodCUR = "91.12.S";
-                            break;
-                        case "COVRAP": //Test rapido
-                            break;
-                        case "COVG": //IgG
-                        case "COVIGG":
-                        case "COVIDG":
-                        case "COVIGS_2":
-                        case "COVIG_2":
-                        case "COVIG_5":
-                        case "COVRAP_2":
-                            tmpCodCUR = "91.31.c";
-                            break;
-                        case "COVM": //IgM
-                        case "COVIGM":
-                        case "COVIDM":
-                        case "COVIGS_3":
-                        case "COVIG_3":
-                        case "COVIG_6":
-                        case "COVRAP_3":
-                            tmpCodCUR = "91.31.d";
-                            break;
-                        case "COVT": //Ig Totali
-                        case "COVTG":
-                        case "COVTGM":
-                        case "COVR":
-                            break;
-                        case "COVIGA": //IgA
-                            break;
-                    }
-                    break;
-                default:
-                    break;
+                switch (prmTipo)
+                {
+                    case enumTipoTracciato.ATS:
+                        break;
+                    case enumTipoTracciato.AUSLPC:
+                        break;
+                    case enumTipoTracciato.EMILIA:
+                        switch (tmpEsame)
+                        {
+                            case "COVID": //Tamponi per la Ricerca RNA SARS-CoV-2
+                                tmpCodCUR = "44";
+                                break;
+                            case "COVRAP": //Test Immunocromatografci
+                                tmpCodCUR = "01";
+                                break;
+                            default: //Test CLIA O ELISA
+                                tmpCodCUR = "02";
+                                break;
+                        }
+                        break;
+                    case enumTipoTracciato.PIEMONTE:
+                        switch (tmpEsame)
+                        {
+                            case "COVID": //Tampone
+                                tmpCodCUR = "91.12.S";
+                                break;
+                            case "COVRAP": //Test rapido
+                                break;
+                            case "COVG": //IgG
+                            case "COVIGG":
+                            case "COVIDG":
+                            case "COVIGS_2":
+                            case "COVIG_2":
+                            case "COVIG_5":
+                            case "COVRAP_2":
+                                tmpCodCUR = "91.31.c";
+                                break;
+                            case "COVM": //IgM
+                            case "COVIGM":
+                            case "COVIDM":
+                            case "COVIGS_3":
+                            case "COVIG_3":
+                            case "COVIG_6":
+                            case "COVRAP_3":
+                                tmpCodCUR = "91.31.d";
+                                break;
+                            case "COVT": //Ig Totali
+                            case "COVTG":
+                            case "COVTGM":
+                            case "COVR":
+                                break;
+                            case "COVIGA": //IgA
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (tmpEsame)
+                {
+                    case "COVID": //Tampone
+                        tmpCodCUR = enumTipoEsame.Tampone.ToString();
+                        break;
+                    case "COVRAP": //Test rapido
+                        tmpCodCUR = enumTipoEsame.TestRapido.ToString();
+                        break;
+                    case "COVG": //IgG
+                    case "COVIGG":
+                    case "COVIDG":
+                    case "COVIGS_2":
+                    case "COVIG_2":
+                    case "COVIG_5":
+                    case "COVRAP_2":
+                        tmpCodCUR = enumTipoEsame.IgG.ToString();
+                        break;
+                    case "COVM": //IgM
+                    case "COVIGM":
+                    case "COVIDM":
+                    case "COVIGS_3":
+                    case "COVIG_3":
+                    case "COVIG_6":
+                    case "COVRAP_3":
+                        tmpCodCUR = enumTipoEsame.IgM.ToString();
+                        break;
+                    case "COVT": //Ig Totali
+                    case "COVTG":
+                    case "COVTGM":
+                    case "COVR":
+                        tmpCodCUR = enumTipoEsame.IgTot.ToString();
+                        break;
+                    case "COVIGA": //IgA
+                        tmpCodCUR = enumTipoEsame.IgA.ToString();
+                        break;
+                }
             }
             return tmpCodCUR;
         }
@@ -795,7 +867,7 @@ namespace waCOVID
                             dv.RowFilter = "BCP='EMILIA ROMAGNA' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO'";
                             //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
-                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "dt_richiesta", "cognome", "nome", "dt_nasc", "cod_fisc", "tel", "cod_test", "Igm_ris", "Igg_ris", "es_ris", "cod_lab", "dt_val", "mmg_mc", "Rif_mmg_mc", "dat_lavoro");
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "id_richiesta", "dt_richiesta", "cognome", "nome", "dt_nasc", "cod_fisc", "tel", "cod_test", "Igm_ris", "Igg_ris", "es_ris", "cod_lab", "dt_val", "mmg_mc", "Rif_mmg_mc", "dat_lavoro");
                         }
                     }
                     break;
