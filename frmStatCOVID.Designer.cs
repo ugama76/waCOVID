@@ -48,6 +48,7 @@
             this.txtCFRefertante = new System.Windows.Forms.TextBox();
             this.pnlCFRefertante = new System.Windows.Forms.Panel();
             this.lblStato = new System.Windows.Forms.Label();
+            this.optLiguria = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -254,11 +255,23 @@
             this.lblStato.Size = new System.Drawing.Size(0, 16);
             this.lblStato.TabIndex = 16;
             // 
+            // optLiguria
+            // 
+            this.optLiguria.AutoSize = true;
+            this.optLiguria.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optLiguria.Location = new System.Drawing.Point(871, 77);
+            this.optLiguria.Name = "optLiguria";
+            this.optLiguria.Size = new System.Drawing.Size(85, 20);
+            this.optLiguria.TabIndex = 17;
+            this.optLiguria.Text = "LIGURIA";
+            this.optLiguria.UseVisualStyleBackColor = true;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1086, 271);
+            this.Controls.Add(this.optLiguria);
             this.Controls.Add(this.lblStato);
             this.Controls.Add(this.pnlCFRefertante);
             this.Controls.Add(this.optPiemonte);
@@ -308,6 +321,7 @@
         private System.Windows.Forms.TextBox txtCFRefertante;
         private System.Windows.Forms.Panel pnlCFRefertante;
         private System.Windows.Forms.Label lblStato;
+        private System.Windows.Forms.RadioButton optLiguria;
     }
 }
 
