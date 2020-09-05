@@ -25,7 +25,10 @@ namespace waCOVID
             AUSLPC,
             EMILIA,
             PIEMONTE,
-            LIGURIA
+            LIGURIA,
+            PARMA,
+            MODENA,
+            SARDEGNA
         }
         private enum enumTipoEsame
         {
@@ -46,6 +49,10 @@ namespace waCOVID
         #endregion
 
         #region METODI
+        private new string Right(string value, int length)
+        {
+            return value.Substring(value.Length - length);
+        }
         private void WriteValues()
         {
             using (var writer = new CsvFileWriter("WriteTest.csv"))
@@ -151,10 +158,11 @@ namespace waCOVID
                                         }
                                         else
                                         {
-                                            if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVR") //come da mail Elena Frontini del 19.06
-                                                dr["Setting"] = "Pri_citt";
-                                            else
-                                                dr["Setting"] = optTamponi.Checked ? "17_territoriale" : "Pri_citt"; //add other columns
+                                            //13.08 Remmato questo if inseguito ad indicazioni di Elena Frontini come mail di lunedì 10/08/2020 14:41
+                                            //if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVR") //come da mail Elena Frontini del 19.06
+                                            //    dr["Setting"] = "Pri_citt";
+                                            //else
+                                            dr["Setting"] = optTamponi.Checked ? "17_territoriale" : "Pri_citt"; //add other columns
                                         }
                                         dr["Provenienza"] = optTamponi.Checked ? "" : ""; //add other columns
                                         dr["Materiale"] = optTamponi.Checked ? "BAL TNF" : "";
@@ -252,6 +260,101 @@ namespace waCOVID
                                             dtCsv.Rows.Add(dr); //add other rows  
                                     }
                                     break;
+                                case enumTipoTracciato.MODENA:
+                                    //Nome laboratorio; Altro laboratorio, specificare; Email laboratorio; Cognome assistito; Nome assistito; Data di nascita; Codice fiscale; Comune di residenza; Comune di domicilio; Data esecuzione test sierologico; Data refertazione test sierologico; Tipo prelievo; Test utilizzato; Specificare altro test; IgM pos / neg; IgM titolo; IgG pos / neg; IgG titolo; IgA pos / neg; IgA titolo; Note
+                                    if (i == 0)
+                                    {
+                                        for (int j = 0; j < rowValues.Count(); j++)
+                                        {
+                                            dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
+                                        }
+                                        dtCsv.Columns.Add("Esito"); //add other columns
+                                        dtCsv.Columns.Add("Nome laboratorio"); //add other columns
+                                        dtCsv.Columns.Add("Altro laboratorio, specificare"); //add other columns
+                                        dtCsv.Columns.Add("Email laboratorio"); //add other columns
+                                        dtCsv.Columns.Add("Note"); //add other columns
+                                        dtCsv.Columns.Add("Comune di domicilio"); //add other columns
+                                        dtCsv.Columns.Add("Data esecuzione test sierologico"); //add other columns
+                                        dtCsv.Columns.Add("Data refertazione test sierologico"); //add other columns
+                                        dtCsv.Columns.Add("Specificare altro test"); //add other columns
+                                        //Tipo prelievo; Test utilizzato; ; IgM pos / neg; IgM titolo; IgG pos / neg; IgG titolo; IgA pos / neg; IgA titolo; Note
+                                    }
+                                    else
+                                    {
+                                    }
+                                    break;
+                                case enumTipoTracciato.PARMA:
+                                    //CF_PAZIENTE; COGNOME; NOME; sesso; DATA_DI_NASCITA; COMUNE RESID; Telefono; data_segnalazione; test_rapido; risultato_test_rapido; test_sierologico; risultato_test_sierologico; tampone_nasofaringeo
+                                    if (i == 0)
+                                    {
+                                        for (int j = 0; j < rowValues.Count(); j++)
+                                        {
+                                            dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
+                                        }
+                                        dtCsv.Columns.Add("Esito"); //add other columns
+                                        dtCsv.Columns.Add("Telefono");//add other columns
+                                        dtCsv.Columns.Add("data_segnalazione");//add other columns
+                                        dtCsv.Columns.Add("test_rapido"); //add other columns
+                                        dtCsv.Columns.Add("risultato_test_rapido"); //add other columns
+                                        dtCsv.Columns.Add("test_sierologico"); //add other columns
+                                        dtCsv.Columns.Add("risultato_test_sierologico"); //add other columns
+                                        dtCsv.Columns.Add("tampone_nasofaringeo"); //add other columns
+                                    }
+                                    else
+                                    {
+                                        DataRow dr = dtCsv.NewRow();
+                                        for (int k = 0; k < rowValues.Count(); k++)
+                                        {
+                                            dr[k] = rowValues[k].ToString().Trim();
+                                        }
+                                        DateTime dNas;
+                                        tmpEsame = dr["Test_utilizzato"].ToString();
+                                        dr["Telefono"] = dr["cellulare"].ToString();
+                                        dr["data_segnalazione"] = DateTime.Now.Date.ToString("dd/MM/yyyy");
+                                        dr["data_segnalazione"] = dr["DATA_REFERTAZIONE"];
+                                        if (!DateTime.TryParse(dr["DATA_DI_NASCITA"].ToString(), out dNas))
+                                            dr["DATA_DI_NASCITA"] = GetDataNascitaFromCF(dr["CF_PAZIENTE"].ToString());
+                                        if (dr["DATA_DI_NASCITA"].ToString() != "")
+                                            dNas = Convert.ToDateTime(dr["DATA_DI_NASCITA"]);
+                                        Enum.TryParse(GetCUR(prmTipo, tmpEsame, true), out enumTipoEsame tmpTipoEsame);
+                                        if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVID")
+                                        {
+                                            dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString());
+                                        }
+                                        else
+                                        {
+                                            dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                        }
+                                        switch (tmpTipoEsame)
+                                        {
+                                            case enumTipoEsame.Tampone:
+                                                dr["tampone_nasofaringeo"] = dr["Esito"].ToString();
+                                                break;
+                                            case enumTipoEsame.TestRapido:
+                                                dr["test_rapido"] = "IgM/IgG";
+                                                dr["risultato_test_rapido"] = dr["Esito"].ToString();
+                                                break;
+                                            case enumTipoEsame.IgG:
+                                                dr["test_sierologico"] = dr["Esito"].ToString();
+                                                dr["risultato_test_sierologico"] = "IgG";
+                                                break;
+                                            case enumTipoEsame.IgM:
+                                                dr["test_sierologico"] = dr["Esito"].ToString();
+                                                dr["risultato_test_sierologico"] = "IgM";
+                                                break;
+                                            case enumTipoEsame.IgA:
+                                                break;
+                                            case enumTipoEsame.IgTot:
+                                                dr["test_sierologico"] = dr["Esito"].ToString();
+                                                dr["risultato_test_sierologico"] = "IgM/IgG";
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        if (dr["id_richiesta"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
+                                            dtCsv.Rows.Add(dr); //add other rows  
+                                    }
+                                    break;
                                 case enumTipoTracciato.PIEMONTE:
                                     if (i == 0)
                                     {
@@ -332,7 +435,7 @@ namespace waCOVID
                                             dr["tipoRichiesta"] = "01"; //SORVEGLIANZA MEDICO COMPETENTE
                                         else
                                             dr["tipoRichiesta"] = "09"; //ESAMI VOLONTARI CITTADINO
-                                        //dr["id_documento"] = "2.16.840.1.113883.2.9.2.10.4.4.129990010" + dr["id_documento"].ToString(); //per il campo Id Documento, hanno assegnato dalla regione il prefisso "2.16.840.1.113883.2.9.2.10.4.4.129990010000000000000"
+                                                                        //dr["id_documento"] = "2.16.840.1.113883.2.9.2.10.4.4.129990010" + dr["id_documento"].ToString(); //per il campo Id Documento, hanno assegnato dalla regione il prefisso "2.16.840.1.113883.2.9.2.10.4.4.129990010000000000000"
                                         dr["id_documento"] = "2.16.840.1.113883.2.9.2.10.4.4.129990010000000000000" + dr["id_documento"].ToString(); //per il campo Id Documento, hanno assegnato dalla regione il prefisso "2.16.840.1.113883.2.9.2.10.4.4.129990010000000000000"
 
                                         //Recupera Data e Luogo di nascita dal Codice Fiscale
@@ -347,7 +450,7 @@ namespace waCOVID
                                         dr["indirizzoDomicilio"] = dr["indirizzoResidenza"];
                                         dr["BCP"] = "PIEMONTE"; //GetLabRif(dr["Punto Accesso"].ToString()); //add other columns
                                         dr["descrStruttura"] = "Lifebrain Piemonte S.r.l."; //add other columns
-                                        //dr["aslAppartenenza"] = "213"; //ASL Alessandria
+                                                                                            //dr["aslAppartenenza"] = "213"; //ASL Alessandria
                                         if (dr["U.S.L."].ToString().Length == 6)
                                             dr["aslAppartenenza"] = dr["U.S.L."].ToString().Substring(3, 3);
                                         else if (dr["Residenza"].ToString() != "")
@@ -430,31 +533,47 @@ namespace waCOVID
                                     }
                                     else
                                     {
+                                        //12.08.2020 Monica Cagnali esclusione Lifebrain Toscana e CF vuoti
                                         DataRow dr = dtCsv.NewRow();
                                         for (int k = 0; k < rowValues.Count(); k++)
                                         {
                                             dr[k] = rowValues[k].ToString().Trim();
                                         }
+                                        if (dr["CODICE_FISCALE"].ToString() == ""
+                                            || dr["DESC_PROVENIENZA_CAMPIONE"].ToString().IndexOf("TOSCANA LIFEBRAIN") > -1)
+                                        {
+                                            progressBar1.Value += 1;
+                                            continue;
+                                        }
+                                        dr["ID_RICHIESTA_PK"] = Right(("00000" + dr["ID_RICHIESTA_PK"].ToString()), 5);
+                                        DateTime dNas;
+                                        if (DateTime.TryParse(dr["DATA_ACCETTAZIONE"].ToString(), out dNas))
+                                            dr["ID_RICHIESTA_PK"] = dNas.ToString("yyyyMMdd") + dr["ID_RICHIESTA_PK"].ToString();
+
                                         dr["TIPOLOGIA_PAZIENTE"] = "1"; //1 = Pazienti esterni/domiciliari
                                         dr["TIPO_IDENTIFICATIVO"] = "CF"; //CF, ENI, STP, TEAM
-                                        //Recupera Data e Luogo di nascita dal Codice Fiscale
-                                        DateTime dNas;
+                                                                          //Recupera Data e Luogo di nascita dal Codice Fiscale
                                         if (!DateTime.TryParse(dr["DATA_NASCITA"].ToString(), out dNas))
                                             dr["DATA_NASCITA"] = GetDataNascitaFromCF(dr["CODICE_FISCALE"].ToString());
-                                        dNas = Convert.ToDateTime(dr["DATA_NASCITA"]);
-                                        dr["COMUNE_NASCITA"] = GetLuogoNascitaFromCF(dr["CODICE_FISCALE"].ToString(), dNas, conn);
+                                        if (dr["DATA_NASCITA"].ToString() != "")
+                                            dNas = Convert.ToDateTime(dr["DATA_NASCITA"]);
+                                        dr["COD_ISTAT_NASCITA"] = GetLuogoNascitaFromCF(dr["CODICE_FISCALE"].ToString(), dNas, conn);
                                         tmpEsame = dr["Test_utilizzato"].ToString();
-                                        dr["CODICE_ANALISI"] = tmpEsame.Substring(0, tmpEsame.IndexOf(" "));
+                                        if (tmpEsame != "")
+                                            dr["CODICE_ANALISI"] = tmpEsame.Substring(0, tmpEsame.IndexOf(" "));
                                         dr["ESITO"] = dr["CODICE_ANALISI"];
-                                        dr["DESC_ANALISI"] = tmpEsame.Substring(tmpEsame.IndexOf(" "));
+                                        if (tmpEsame != "")
+                                            dr["DESC_ANALISI"] = tmpEsame.Substring(tmpEsame.IndexOf(" "));
                                         dr["DESC_ESITO"] = dr["DESC_ANALISI"];
                                         dr["PROG_ESITO"] = "1";
-                                        if (tmpEsame == "COVID")
+                                        if (dr["CODICE_ANALISI"].ToString() == "COVID")
                                         {
-                                            //RNA
+                                            //RNA TAMPONI
+                                            dr["AZIENDA_INVIANTE"] = "88820";
+                                            dr["DESC_AZIENDA_INVIANTE"] = "RETE DIAGNOSTICA ITALIANA";
                                             dr["RISULTATO_NUMERO"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
                                             dr["DESC_RISULTATO"] = dr["RISULTATO_NUMERO"];
-                                            switch (dr["ESITO"].ToString())
+                                            switch (dr["RISULTATO_NUMERO"].ToString())
                                             {
                                                 case "POSITIVO":
                                                     dr["RISULTATO_NUMERO"] = "1";
@@ -476,9 +595,11 @@ namespace waCOVID
                                         else
                                         {
                                             //Sierologici
+                                            dr["AZIENDA_INVIANTE"] = "88812";
+                                            dr["DESC_AZIENDA_INVIANTE"] = "LIFEBRAIN LIGURIA";
                                             dr["RISULTATO_NUMERO"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
                                             dr["DESC_RISULTATO"] = dr["RISULTATO_NUMERO"];
-                                            switch (dr["ESITO"].ToString())
+                                            switch (dr["RISULTATO_NUMERO"].ToString())
                                             {
                                                 case "POSITIVO":
                                                     dr["RISULTATO_NUMERO"] = "11";
@@ -494,17 +615,87 @@ namespace waCOVID
                                                     break;
                                             }
                                         }
-                                        dr["CODICE_CUR"] = GetCUR(prmTipo, tmpEsame, true);
+                                        dr["DESC_MATERIALE"] = dr["ID_MATERIALE"];
+                                        if (dr["ID_MATERIALE"].ToString() != "")
+                                            dr["ID_MATERIALE"] = dr["ID_MATERIALE"].ToString().Substring(0, dr["ID_MATERIALE"].ToString().IndexOf(" "));
+                                        dr["CODICE_CUR"] = GetCUR(prmTipo, tmpEsame, false);
                                         dr["BCP"] = GetLabRif(dr["Punto Accesso"].ToString()); //add other columns
-                                        dr["DATA_ACCETTAZIONE"] += " " + dr["OraAcc"];
+                                        dr["DATA_ACCETTAZIONE"] += " " + dr["OraAcc"].ToString().Replace(".", ":");
                                         dr["DATA_PRELIEVO"] = dr["DATA_ACCETTAZIONE"];
-                                        dr["DATA_ESECUZIONE"] += " " + dr["OraEsame"];
-                                        dr["DATA_ULT_MOD"] = dr["DATA_ESECUZIONE"];
-                                        dr["DATA_REFERTAZIONE"] += " " + dr["OraRef"];
-                                        dr["AZIENDA_INVIANTE"] = "002602";
-                                        dr["DESC_AZIENDA_INVIANTE"] = "Lifebrain Liguria S.r.l.";
+                                        dr["DATA_ESECUZIONE"] += " " + dr["OraEsame"].ToString().Replace(".", ":");
+                                        dr["DATA_ULT_MOD"] = dr["DATA_ESECUZIONE"].ToString() + ":00"; //aggiungo i secondi;
+                                        dr["DATA_REFERTAZIONE"] += " " + dr["OraRef"].ToString().Replace(".", ":");
+
                                         if (dr["ID_RICHIESTA_PK"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
                                             dtCsv.Rows.Add(dr); //add other rows  
+                                    }
+                                    break;
+                                case enumTipoTracciato.SARDEGNA:
+                                    // regione; azienda; laboratorio; id; provenienza; tipo_provenienza; reparto; determinazione; data; cognome; 
+                                    // nome; cf; data_nascita; genere; comune; comune_descrizione; categoria; qualifica; esito_biomolecolare; esito_immunologico
+                                    if (i == 0)
+                                    {
+                                        for (int j = 0; j < rowValues.Count(); j++)
+                                        {
+                                            dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
+                                        }
+                                        dtCsv.Columns.Add("regione"); //add other columns
+                                        dtCsv.Columns.Add("azienda"); //add other columns
+                                        dtCsv.Columns.Add("laboratorio"); //add other columns
+                                        dtCsv.Columns.Add("provenienza"); //add other columns
+                                        dtCsv.Columns.Add("tipo_provenienza"); //add other columns
+                                        dtCsv.Columns.Add("reparto"); //add other columns
+                                        dtCsv.Columns.Add("determinazione"); //add other columns
+                                        dtCsv.Columns.Add("comune"); //add other columns
+                                        dtCsv.Columns.Add("categoria"); //add other columns
+                                        dtCsv.Columns.Add("qualifica"); //add other columns
+                                        dtCsv.Columns.Add("ESITO"); //add other columns
+                                        dtCsv.Columns.Add("esito_biomolecolare"); //add other columns
+                                        dtCsv.Columns.Add("esito_immunologico"); //add other columns
+                                    }
+                                    else
+                                    {
+                                        DataRow dr = dtCsv.NewRow();
+                                        for (int k = 0; k < rowValues.Count(); k++)
+                                        {
+                                            dr[k] = rowValues[k].ToString().Trim();
+                                        }
+                                        dr["regione"] = "200";
+                                        dr["azienda"] = "201";
+                                        dr["laboratorio"] = "001601";
+                                        dr["id"] = dr["id"].ToString().PadRight(16, ' ');
+                                        dr["provenienza"] = new string(' ', 8);
+                                        dr["tipo_provenienza"] = " ";
+                                        dr["reparto"] = new string(' ', 4);
+                                        dr["determinazione"] = new string(' ', 1);
+                                        DateTime dNas;
+                                        if (DateTime.TryParse(dr["DATA"].ToString(), out dNas))
+                                            dr["DATA"] = dNas.ToString("ddMMyyyy");
+                                        dr["cognome"] = dr["cognome"].ToString().PadRight(30, ' ');
+                                        dr["nome"] = dr["nome"].ToString().PadRight(20, ' ');
+                                        if (DateTime.TryParse(dr["data_nascita"].ToString(), out dNas))
+                                            dr["data_nascita"] = dNas.ToString("ddMMyyyy");
+                                        else
+                                            dr["data_nascita"] = Convert.ToDateTime(GetDataNascitaFromCF(dr["cf"].ToString())).ToString("ddMMyyyy");
+                                        dr["genere"] = " ";
+                                        dr["comune"] = new string(' ', 6);
+                                        dr["comune_descrizione"] = new string(' ', 27);
+                                        dr["categoria"] = " ";
+                                        dr["qualifica"] = " ";
+                                        tmpEsame = dr["Test_utilizzato"].ToString();
+                                        if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVID")
+                                        {
+                                            dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString());
+                                        }
+                                        else
+                                        {
+                                            dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                        }
+                                        dr["esito_biomolecolare"] = " ";
+                                        dr["esito_immunologico"] = " ";
+                                        if (dr["id"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
+                                            dtCsv.Rows.Add(dr); //add other rows  
+
                                     }
                                     break;
 
@@ -699,12 +890,28 @@ namespace waCOVID
                     case "COVG":
                     case "COVIG_3":
                     case "COVIG_5":
-                        if (dRiu < (decimal)0.9)
-                            tmpRis = "NEGATIVO";
-                        else if (dRiu >= (decimal)0.9 && dRiu < (decimal)1.1)
-                            tmpRis = "DUBBIO";
-                        else if (dRiu >= (decimal)1.1)
-                            tmpRis = "POSITIVO";
+                        if (prmCodRis.Trim() != "")
+                        {
+                            switch (prmCodRis)
+                            {
+                                case "NEG":
+                                case "MAG":
+                                    tmpRis = "NEGATIVO";
+                                    break;
+                                case "POS":
+                                    tmpRis = "POSITIVO";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if (dRiu < (decimal)0.9)
+                                tmpRis = "NEGATIVO";
+                            else if (dRiu >= (decimal)0.9 && dRiu < (decimal)1.1)
+                                tmpRis = "DUBBIO";
+                            else if (dRiu >= (decimal)1.1)
+                                tmpRis = "POSITIVO";
+                        }
                         break;
                     case "COVIDM":
                         if (dRiu < (decimal)0.9)
@@ -737,10 +944,26 @@ namespace waCOVID
                     case "COVR":
                     case "COVIGM":
                     case "COVIG_6":
-                        if (dRiu < (decimal)1)
-                            tmpRis = "NEGATIVO";
-                        else if (dRiu >= (decimal)1)
-                            tmpRis = "POSITIVO";
+                        if (prmCodRis.Trim() != "")
+                        {
+                            switch (prmCodRis)
+                            {
+                                case "NEG":
+                                case "MAG":
+                                    tmpRis = "NEGATIVO";
+                                    break;
+                                case "POS":
+                                    tmpRis = "POSITIVO";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if (dRiu < (decimal)1)
+                                tmpRis = "NEGATIVO";
+                            else if (dRiu >= (decimal)1)
+                                tmpRis = "POSITIVO";
+                        }
                         break;
                     case "COVIGG":
                         if (dRiu < (decimal)12.0)
@@ -760,9 +983,19 @@ namespace waCOVID
         {
             return GetCUR(prmTipo, prmEsame, false);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="prmTipo">Tipologi di tracciato</param>
+        /// <param name="prmEsame">Codice dell'esame</param>
+        /// <param name="prmTipoEsame">se True restituisce la tipologia di test (es. Tampone, Rapigo, IgM, ecc.</param>
+        /// <returns></returns>
         private string GetCUR(enumTipoTracciato prmTipo, string prmEsame, bool prmTipoEsame)
         {
             string tmpCodCUR = "";
+            if (prmEsame == "")
+                return "";
+
             string tmpEsame = prmEsame.Substring(0, prmEsame.IndexOf(" "));
             if (prmTipoEsame == false)
             {
@@ -973,7 +1206,7 @@ namespace waCOVID
                         dr.Read();
                         return dr["CodIstat"].ToString(); //Restituisce la prima occorrenza
                     }
-                    else
+                    else if (chkVerificaDatiCF.Checked)
                         MessageBox.Show("Nessun comune trovato con Belfiore: " + tmpBelfiore + "\r\n(C.F. paziente: " + prmCF + ")", "ERRORE", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -993,7 +1226,7 @@ namespace waCOVID
 
                     if (chkFileEsteso.Checked == false)
                     {
-                        dv.RowFilter = "BCP='" + (optTradate.Checked ? optTradate.Text : optViadana.Text) + "' AND Esito<>'ANNULLATO'";
+                        dv.RowFilter = "BCP='" + (optTradate.Checked ? optTradate.Text : optViadana.Text) + "' AND Esito<>'ANNULLATO' AND Cognome<>'PROVA'";
                         dtDataTable = dv.ToTable();
 
                         if (optSierologici.Checked)
@@ -1017,7 +1250,7 @@ namespace waCOVID
                         if (chkFileEsteso.Checked == false)
                         {
                             dv = dtDataTable.DefaultView;
-                            dv.RowFilter = "Test_utilizzato NOT LIKE 'COVID %' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO'";
+                            dv.RowFilter = "Test_utilizzato NOT LIKE 'COVID %' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO' AND Cognome<>'PROVA'";
                             dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
                             dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "Nome", "Cognome", "Codice Fiscale", "Comune residenza", "Cellulare", "Mail", "tampone nasofaringeo privato");
@@ -1030,7 +1263,33 @@ namespace waCOVID
                         if (chkFileEsteso.Checked == false)
                         {
                             dv = dtDataTable.DefaultView;
-                            dv.RowFilter = "BCP='EMILIA ROMAGNA' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO'";
+                            dv.RowFilter = "BCP='EMILIA ROMAGNA' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO' AND cognome<>'PROVA'";
+                            //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
+
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "id_richiesta", "dt_richiesta", "cognome", "nome", "dt_nasc", "cod_fisc", "tel", "cod_test", "Igm_ris", "Igg_ris", "es_ris", "cod_lab", "dt_val", "mmg_mc", "Rif_mmg_mc", "dat_lavoro");
+                        }
+                    }
+                    break;
+                case enumTipoTracciato.PARMA:
+                    if (chkFileEsteso.Checked == false)
+                    {
+                        if (chkFileEsteso.Checked == false)
+                        {
+                            dv = dtDataTable.DefaultView;
+                            dv.RowFilter = " Esito<>'ANNULLATO' AND cognome<>'PROVA'";
+                            //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
+
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "CF_PAZIENTE", "COGNOME", "NOME", "sesso", "DATA_DI_NASCITA", "COMUNE RESID", "Telefono", "data_segnalazione", "test_rapido", "risultato_test_rapido", "test_sierologico", "risultato_test_sierologico", "tampone_nasofaringeo");
+                        }
+                    }
+                    break;
+                case enumTipoTracciato.MODENA:
+                    if (chkFileEsteso.Checked == false)
+                    {
+                        if (chkFileEsteso.Checked == false)
+                        {
+                            dv = dtDataTable.DefaultView;
+                            dv.RowFilter = " ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO' AND cognome<>'PROVA'";
                             //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
                             dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "id_richiesta", "dt_richiesta", "cognome", "nome", "dt_nasc", "cod_fisc", "tel", "cod_test", "Igm_ris", "Igg_ris", "es_ris", "cod_lab", "dt_val", "mmg_mc", "Rif_mmg_mc", "dat_lavoro");
@@ -1043,7 +1302,7 @@ namespace waCOVID
                         if (chkFileEsteso.Checked == false)
                         {
                             dv = dtDataTable.DefaultView;
-                            dv.RowFilter = "esitoDesc<>'ANNULLATO'";
+                            dv.RowFilter = "esitoDesc<>'ANNULLATO' AND cognome<>'PROVA'";
                             //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
                             dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "descrStruttura", "idStruttura", "matrStruttura", "idAsr", "aslAppartenenza", "tipoRichiesta", "legalauthenticator",
@@ -1058,13 +1317,31 @@ namespace waCOVID
                         if (chkFileEsteso.Checked == false)
                         {
                             dv = dtDataTable.DefaultView;
-                            dv.RowFilter = "DESC_RISULTATO<>'ANNULLATO'";
+                            dv.RowFilter = "DESC_RISULTATO<>'ANNULLATO' AND COGNOME<>'PROVA'";
+                            dv.Sort = "ID_RICHIESTA_PK ASC";
                             //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
                             dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "AZIENDA_INVIANTE", "DESC_AZIENDA_INVIANTE", "TIPOLOGIA_PAZIENTE", "COGNOME", "NOME", "SESSO", "DATA_NASCITA", "DATA_DECESSO", "COD_ISTAT_NASCITA", "COMUNE_NASCITA", "TIPO_IDENTIFICATIVO",
-                                "CODICE_FISCALE", "COD_ISTAT_RESIDENZA", "COMUNE_RESIDENZA", "REGIONE_RESIDENZA", "VIA_RESIDENZA", "CIVICO_RESIDENZA", "CAP_RESIDENZA", "DESC_REGIONE_RESIDENZA", "COD_ISTAT_DOMICILIO", 
-                                "COMUNE_DOMICILIO", "VIA_DOMICILIO", "CIVICO_DOMICILIO", "CAP_DOMICILIO", "ID_RICHIESTA_PK", "DATA_PRELIEVO", "DATA_ACCETTAZIONE", "DESC_PROVENIENZA_CAMPIONE", "ID_CAMPIONE", "ID_MATERIALE", 
+                                "CODICE_FISCALE", "COD_ISTAT_RESIDENZA", "COMUNE_RESIDENZA", "REGIONE_RESIDENZA", "VIA_RESIDENZA", "CIVICO_RESIDENZA", "CAP_RESIDENZA", "DESC_REGIONE_RESIDENZA", "COD_ISTAT_DOMICILIO",
+                                "COMUNE_DOMICILIO", "VIA_DOMICILIO", "CIVICO_DOMICILIO", "CAP_DOMICILIO", "ID_RICHIESTA_PK", "DATA_PRELIEVO", "DATA_ACCETTAZIONE", "DESC_PROVENIENZA_CAMPIONE", "ID_CAMPIONE", "ID_MATERIALE",
                                 "DESC_MATERIALE", "CODICE_ANALISI", "DESC_ANALISI", "CODICE_CUR", "PROG_ESITO", "ESITO", "DESC_ESITO", "METODICA", "LOINC", "RISULTATO_NUMERO", "DESC_RISULTATO", "DATA_ESECUZIONE", "DATA_REFERTAZIONE", "DATA_ULT_MOD");
+
+                            //Assegna i PROG_ESITO in base al campo ID_RICHIESTA_PK
+                            //dtDataTable = CalcolaProgressiviEsamiLiguria(dtDataTable);
+                        }
+                    }
+                    break;
+                case enumTipoTracciato.SARDEGNA:
+                    if (chkFileEsteso.Checked == false)
+                    {
+                        if (chkFileEsteso.Checked == false)
+                        {
+                            dv = dtDataTable.DefaultView;
+                            dv.RowFilter = " Esito<>'ANNULLATO' AND cognome<>'PROVA'";
+                            //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
+
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "regione", "azienda", "laboratorio", "id", "provenienza", "tipo_provenienza", "reparto", "determinazione", "data", "cognome", "nome",
+                                "cf", "data_nascita", "genere", "comune", "comune_descrizione", "categoria", "qualifica", "esito_biomolecolare", "esito_immunologico");
                         }
                     }
                     break;
@@ -1075,14 +1352,28 @@ namespace waCOVID
 
 
             StreamWriter sw = new StreamWriter(strFilePath, false);
+            string tmpSep = ";";
+            bool bIntesta = true;
             //headers  
-            for (int i = 0; i < dtDataTable.Columns.Count; i++)
+            //Per la Liguria il CSV non deve avere intestazione
+            //Per la Sardegna il file è ASCII e non CSV
+            if (optSardegna.Checked)
             {
-                sw.Write(dtDataTable.Columns[i]);
-                if (i < dtDataTable.Columns.Count - 1)
-                    sw.Write(";");
+                bIntesta = false;
+                tmpSep = "";
             }
-            sw.Write(sw.NewLine);
+            if (optLiguria.Checked == true && chkFileEsteso.Checked == false)
+                bIntesta = false;
+            if (bIntesta)
+            {
+                for (int i = 0; i < dtDataTable.Columns.Count; i++)
+                {
+                    sw.Write(dtDataTable.Columns[i]);
+                    if (i < dtDataTable.Columns.Count - 1)
+                        sw.Write(";");
+                }
+                sw.Write(sw.NewLine);
+            }
             foreach (DataRow dr in dtDataTable.Rows)
             {
                 for (int i = 0; i < dtDataTable.Columns.Count; i++)
@@ -1101,7 +1392,7 @@ namespace waCOVID
                         }
                     }
                     if (i < dtDataTable.Columns.Count - 1)
-                        sw.Write(";");
+                        sw.Write(tmpSep);
                 }
                 sw.Write(sw.NewLine);
             }
@@ -1117,8 +1408,16 @@ namespace waCOVID
                 tmpTipo = enumTipoTracciato.EMILIA;
             else if (optPiemonte.Checked)
                 tmpTipo = enumTipoTracciato.PIEMONTE;
+            else if (optParma.Checked)
+                tmpTipo = enumTipoTracciato.PARMA;
+            else if (optModena.Checked)
+                tmpTipo = enumTipoTracciato.MODENA;
+            else if (optPiemonte.Checked)
+                tmpTipo = enumTipoTracciato.PIEMONTE;
             else if (optLiguria.Checked)
                 tmpTipo = enumTipoTracciato.LIGURIA;
+            else if (optSardegna.Checked)
+                tmpTipo = enumTipoTracciato.SARDEGNA;
             else
                 tmpTipo = enumTipoTracciato.ATS;
 
@@ -1150,6 +1449,20 @@ namespace waCOVID
                             + (chkFileEsteso.Checked ? "\\JLab ER Covid " : "\\AUSL ER Covid ")
                             + ".CSV");
                         break;
+
+                    case enumTipoTracciato.PARMA:
+
+                        WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
+                            + (chkFileEsteso.Checked ? "\\JLab Parma Covid " : "\\AUSL Parma Covid ")
+                            + ".CSV");
+                        break;
+                    case enumTipoTracciato.MODENA:
+
+                        WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
+                            + (chkFileEsteso.Checked ? "\\JLab Modena Covid " : "\\AUSL Modena Covid ")
+                            + ".CSV");
+                        break;
+
                     case enumTipoTracciato.PIEMONTE:
                         //18.06 Abbiamo parlato con Alessandro Rosa che ci ha detto di non considerare i pazienti che effettuano le Ig Totali che quindi in caso
                         //di risultato negativo non verrano comunicati alla regione
@@ -1159,9 +1472,16 @@ namespace waCOVID
                         break;
                     case enumTipoTracciato.LIGURIA:
                         WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
-                            + (chkFileEsteso.Checked ? "\\JLab Liguria Covid " : "\\Liguria Covid ")
+                            + (chkFileEsteso.Checked ? "\\JLab Liguria Covid " : "\\COVLP888220")
                             + ".CSV");
                         break;
+                    case enumTipoTracciato.SARDEGNA:
+
+                        WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
+                            + (chkFileEsteso.Checked ? "\\JLab Sardegna Covid " : "\\FlussoTCovid ")
+                            + ".TXT");
+                        break;
+
                     default:
                         break;
                 }
@@ -1224,6 +1544,28 @@ namespace waCOVID
             return prmTable;
         }
 
+        public DataTable CalcolaProgressiviEsamiLiguria(DataTable prmTable)
+        {
+            string tmpCodAcc = "";
+            int k = 1;
+            if (prmTable.Rows.Count > 0)
+                tmpCodAcc = prmTable.Rows[0]["ID_RICHIESTA_PK"].ToString();
+            for (int i = 0; i < prmTable.Rows.Count; i++)
+            {
+                if (tmpCodAcc == prmTable.Rows[0]["ID_RICHIESTA_PK"].ToString())
+                {
+                    prmTable.Rows[0]["PROG_ESITO"] = k;
+                    k += 1;
+                }
+                else
+                {
+                    tmpCodAcc = prmTable.Rows[0]["ID_RICHIESTA_PK"].ToString();
+                    prmTable.Rows[0]["PROG_ESITO"] = 1;
+                    k += 1;
+                }
+            }
+            return prmTable;
+        }
         #endregion
 
         #region EVENTI
@@ -1235,6 +1577,12 @@ namespace waCOVID
                 optPiacenza.Checked = true;
             else if (lblFileOrigine.Text.IndexOf("COVEM") > 0)
                 optEmiliaRomagna.Checked = true;
+            else if (lblFileOrigine.Text.IndexOf("COPAR") > 0)
+                optParma.Checked = true;
+            else if (lblFileOrigine.Text.IndexOf("COMOD") > 0)
+                optModena.Checked = true;
+            else if (lblFileOrigine.Text.IndexOf("COSAR") > 0)
+                optSardegna.Checked = true;
             else if (lblFileOrigine.Text.IndexOf("COASL") > 0)
                 optPiemonte.Checked = true;
             else if (lblFileOrigine.Text.IndexOf("ALISA") > 0)
@@ -1268,5 +1616,80 @@ namespace waCOVID
 
         #endregion
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string tempLineValue;
+            int Prog = int.Parse("0" + txtStartProg.Text);
+            int NRec = 0, NImp = 0, NEsa = 0;
+            decimal Lordo = 0, Ticket = 0, Netto = 0;
+            txtNumRecord.Text = "0";
+            txtNumImp.Text = "0";
+            txtNumEsami.Text = "0";
+            txtLordo.Text = "0";
+            txtTicket.Text = "0";
+            txtNetto.Text = "0";
+
+            progressBar1.Value = 0;
+            using (FileStream inputStream = File.OpenRead(lblFileOrigine.Text))
+            {
+                using (StreamReader inputReader = new StreamReader(inputStream))
+                {
+                    Stream baseStream = inputReader.BaseStream;
+                    long length = baseStream.Length;
+                    using (StreamWriter outputWriter = File.AppendText(lblFileOrigine.Text + ".ugo"))
+                    {
+                        while (null != (tempLineValue = inputReader.ReadLine()))
+                        {
+                            var aStringBuilder = new StringBuilder(tempLineValue);
+                            if (lblFileOrigine.Text.IndexOf("SPS") > 0)
+                            {
+                                NRec += 1;
+                                aStringBuilder.Remove(28, 20);
+                                //aStringBuilder.Insert(28, "60830120200701" + Prog.ToString("000000"));
+                                aStringBuilder.Insert(28, "56308920200701" + Prog.ToString("000000"));
+                                if (tempLineValue.Substring(48, 2) == "99")
+                                {
+                                    NImp += 1;
+                                    Prog += 1;
+                                    Ticket += decimal.Parse(tempLineValue.Substring(131, 9).Replace(".", ","));
+                                    Netto += decimal.Parse(tempLineValue.Substring(140, 9).Replace(".", ","));
+                                }
+                                else
+                                {
+                                    Lordo += decimal.Parse(tempLineValue.Substring(140, 9).Replace(".", ","));
+                                    NEsa += int.Parse(tempLineValue.Substring(128, 3));
+                                }
+                            }
+                            else if (lblFileOrigine.Text.IndexOf("SPA") > 0)
+                            {
+                                aStringBuilder.Remove(25, 20);
+                                //aStringBuilder.Insert(25, "60830120200701" + Prog.ToString("000000"));
+                                aStringBuilder.Insert(25, "56308920200701" + Prog.ToString("000000"));
+
+                                Prog += 1;
+                            }
+                            tempLineValue = aStringBuilder.ToString();
+                            outputWriter.WriteLine(tempLineValue);
+
+                            progressBar1.Value = (int)(baseStream.Position / length * 100);
+                            progressBar1.Refresh();
+                        }
+                    }
+                }
+            }
+            txtNumRecord.Text = NRec.ToString();
+            txtNumImp.Text = NImp.ToString();
+            txtNumEsami.Text = NEsa.ToString();
+            txtLordo.Text = Lordo.ToString("#.##");
+            txtTicket.Text = Ticket.ToString("#.##");
+            txtNetto.Text = Netto.ToString("#.##");
+
+            MessageBox.Show("Elaborazione terminata!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void txtStartProg_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

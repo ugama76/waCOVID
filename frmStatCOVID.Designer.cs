@@ -37,6 +37,7 @@
             this.optTradate = new System.Windows.Forms.RadioButton();
             this.optViadana = new System.Windows.Forms.RadioButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chkVerificaDatiCF = new System.Windows.Forms.CheckBox();
             this.pnlTipoFile = new System.Windows.Forms.Panel();
             this.optSierologici = new System.Windows.Forms.RadioButton();
             this.optTamponi = new System.Windows.Forms.RadioButton();
@@ -49,9 +50,29 @@
             this.pnlCFRefertante = new System.Windows.Forms.Panel();
             this.lblStato = new System.Windows.Forms.Label();
             this.optLiguria = new System.Windows.Forms.RadioButton();
+            this.optModena = new System.Windows.Forms.RadioButton();
+            this.optParma = new System.Windows.Forms.RadioButton();
+            this.button1 = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtNetto = new System.Windows.Forms.TextBox();
+            this.txtTicket = new System.Windows.Forms.TextBox();
+            this.txtLordo = new System.Windows.Forms.TextBox();
+            this.txtNumEsami = new System.Windows.Forms.TextBox();
+            this.txtNumImp = new System.Windows.Forms.TextBox();
+            this.txtNumRecord = new System.Windows.Forms.TextBox();
+            this.txtStartProg = new System.Windows.Forms.TextBox();
+            this.optSardegna = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -95,7 +116,7 @@
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.progressBar1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.progressBar1.Location = new System.Drawing.Point(0, 248);
+            this.progressBar1.Location = new System.Drawing.Point(0, 330);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(1086, 23);
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -129,6 +150,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.chkVerificaDatiCF);
             this.panel1.Controls.Add(this.pnlTipoFile);
             this.panel1.Controls.Add(this.cmdSelFile);
             this.panel1.Controls.Add(this.lblFileOrigine);
@@ -136,6 +158,19 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(730, 136);
             this.panel1.TabIndex = 7;
+            // 
+            // chkVerificaDatiCF
+            // 
+            this.chkVerificaDatiCF.AutoSize = true;
+            this.chkVerificaDatiCF.Checked = true;
+            this.chkVerificaDatiCF.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkVerificaDatiCF.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkVerificaDatiCF.Location = new System.Drawing.Point(12, 96);
+            this.chkVerificaDatiCF.Name = "chkVerificaDatiCF";
+            this.chkVerificaDatiCF.Size = new System.Drawing.Size(221, 20);
+            this.chkVerificaDatiCF.TabIndex = 22;
+            this.chkVerificaDatiCF.Text = "Verifica correttezza dati C.F.";
+            this.chkVerificaDatiCF.UseVisualStyleBackColor = true;
             // 
             // pnlTipoFile
             // 
@@ -184,7 +219,7 @@
             // 
             this.optPiacenza.AutoSize = true;
             this.optPiacenza.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optPiacenza.Location = new System.Drawing.Point(751, 48);
+            this.optPiacenza.Location = new System.Drawing.Point(751, 46);
             this.optPiacenza.Name = "optPiacenza";
             this.optPiacenza.Size = new System.Drawing.Size(100, 20);
             this.optPiacenza.TabIndex = 10;
@@ -196,7 +231,7 @@
             // 
             this.optEmiliaRomagna.AutoSize = true;
             this.optEmiliaRomagna.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optEmiliaRomagna.Location = new System.Drawing.Point(871, 48);
+            this.optEmiliaRomagna.Location = new System.Drawing.Point(871, 46);
             this.optEmiliaRomagna.Name = "optEmiliaRomagna";
             this.optEmiliaRomagna.Size = new System.Drawing.Size(154, 20);
             this.optEmiliaRomagna.TabIndex = 11;
@@ -208,7 +243,7 @@
             // 
             this.optPiemonte.AutoSize = true;
             this.optPiemonte.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optPiemonte.Location = new System.Drawing.Point(751, 77);
+            this.optPiemonte.Location = new System.Drawing.Point(751, 102);
             this.optPiemonte.Name = "optPiemonte";
             this.optPiemonte.Size = new System.Drawing.Size(104, 20);
             this.optPiemonte.TabIndex = 12;
@@ -259,18 +294,207 @@
             // 
             this.optLiguria.AutoSize = true;
             this.optLiguria.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optLiguria.Location = new System.Drawing.Point(871, 77);
+            this.optLiguria.Location = new System.Drawing.Point(871, 102);
             this.optLiguria.Name = "optLiguria";
             this.optLiguria.Size = new System.Drawing.Size(85, 20);
             this.optLiguria.TabIndex = 17;
             this.optLiguria.Text = "LIGURIA";
             this.optLiguria.UseVisualStyleBackColor = true;
             // 
+            // optModena
+            // 
+            this.optModena.AutoSize = true;
+            this.optModena.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optModena.Location = new System.Drawing.Point(871, 74);
+            this.optModena.Name = "optModena";
+            this.optModena.Size = new System.Drawing.Size(91, 20);
+            this.optModena.TabIndex = 19;
+            this.optModena.Text = "MODENA";
+            this.optModena.UseVisualStyleBackColor = true;
+            // 
+            // optParma
+            // 
+            this.optParma.AutoSize = true;
+            this.optParma.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optParma.Location = new System.Drawing.Point(751, 74);
+            this.optParma.Name = "optParma";
+            this.optParma.Size = new System.Drawing.Size(79, 20);
+            this.optParma.TabIndex = 18;
+            this.optParma.Text = "PARMA";
+            this.optParma.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(29, 65);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(129, 23);
+            this.button1.TabIndex = 20;
+            this.button1.Text = "Rinumera Citotest";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.label7);
+            this.panel2.Controls.Add(this.label6);
+            this.panel2.Controls.Add(this.label5);
+            this.panel2.Controls.Add(this.label4);
+            this.panel2.Controls.Add(this.label3);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.txtNetto);
+            this.panel2.Controls.Add(this.txtTicket);
+            this.panel2.Controls.Add(this.txtLordo);
+            this.panel2.Controls.Add(this.txtNumEsami);
+            this.panel2.Controls.Add(this.txtNumImp);
+            this.panel2.Controls.Add(this.txtNumRecord);
+            this.panel2.Controls.Add(this.txtStartProg);
+            this.panel2.Controls.Add(this.button1);
+            this.panel2.Location = new System.Drawing.Point(12, 224);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1062, 100);
+            this.panel2.TabIndex = 21;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(879, 46);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(40, 16);
+            this.label7.TabIndex = 34;
+            this.label7.Text = "Netto";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(734, 46);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(45, 16);
+            this.label6.TabIndex = 33;
+            this.label6.Text = "Ticket";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(593, 46);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(43, 16);
+            this.label5.TabIndex = 32;
+            this.label5.Text = "Lordo";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(460, 46);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(60, 16);
+            this.label4.TabIndex = 31;
+            this.label4.Text = "N°Esami";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(332, 46);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(64, 16);
+            this.label3.TabIndex = 30;
+            this.label3.Text = "N°Ricette";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(200, 46);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 16);
+            this.label2.TabIndex = 29;
+            this.label2.Text = "N°Record";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(26, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(136, 16);
+            this.label1.TabIndex = 28;
+            this.label1.Text = "Inizia dal Progressivo";
+            // 
+            // txtNetto
+            // 
+            this.txtNetto.Location = new System.Drawing.Point(882, 65);
+            this.txtNetto.Name = "txtNetto";
+            this.txtNetto.Size = new System.Drawing.Size(100, 22);
+            this.txtNetto.TabIndex = 27;
+            this.txtNetto.Text = "0";
+            // 
+            // txtTicket
+            // 
+            this.txtTicket.Location = new System.Drawing.Point(737, 65);
+            this.txtTicket.Name = "txtTicket";
+            this.txtTicket.Size = new System.Drawing.Size(100, 22);
+            this.txtTicket.TabIndex = 26;
+            this.txtTicket.Text = "0";
+            // 
+            // txtLordo
+            // 
+            this.txtLordo.Location = new System.Drawing.Point(596, 65);
+            this.txtLordo.Name = "txtLordo";
+            this.txtLordo.Size = new System.Drawing.Size(100, 22);
+            this.txtLordo.TabIndex = 25;
+            this.txtLordo.Text = "0";
+            // 
+            // txtNumEsami
+            // 
+            this.txtNumEsami.Location = new System.Drawing.Point(463, 65);
+            this.txtNumEsami.Name = "txtNumEsami";
+            this.txtNumEsami.Size = new System.Drawing.Size(100, 22);
+            this.txtNumEsami.TabIndex = 24;
+            this.txtNumEsami.Text = "0";
+            // 
+            // txtNumImp
+            // 
+            this.txtNumImp.Location = new System.Drawing.Point(335, 65);
+            this.txtNumImp.Name = "txtNumImp";
+            this.txtNumImp.Size = new System.Drawing.Size(100, 22);
+            this.txtNumImp.TabIndex = 23;
+            this.txtNumImp.Text = "0";
+            // 
+            // txtNumRecord
+            // 
+            this.txtNumRecord.Location = new System.Drawing.Point(203, 65);
+            this.txtNumRecord.Name = "txtNumRecord";
+            this.txtNumRecord.Size = new System.Drawing.Size(100, 22);
+            this.txtNumRecord.TabIndex = 22;
+            this.txtNumRecord.Text = "0";
+            // 
+            // txtStartProg
+            // 
+            this.txtStartProg.Location = new System.Drawing.Point(29, 28);
+            this.txtStartProg.Name = "txtStartProg";
+            this.txtStartProg.Size = new System.Drawing.Size(100, 22);
+            this.txtStartProg.TabIndex = 21;
+            this.txtStartProg.Text = "6";
+            this.txtStartProg.TextChanged += new System.EventHandler(this.txtStartProg_TextChanged);
+            // 
+            // optSardegna
+            // 
+            this.optSardegna.AutoSize = true;
+            this.optSardegna.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optSardegna.Location = new System.Drawing.Point(751, 130);
+            this.optSardegna.Name = "optSardegna";
+            this.optSardegna.Size = new System.Drawing.Size(110, 20);
+            this.optSardegna.TabIndex = 22;
+            this.optSardegna.Text = "SARDEGNA";
+            this.optSardegna.UseVisualStyleBackColor = true;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1086, 271);
+            this.ClientSize = new System.Drawing.Size(1086, 353);
+            this.Controls.Add(this.optSardegna);
+            this.Controls.Add(this.panel2);
+            this.Controls.Add(this.optModena);
+            this.Controls.Add(this.optParma);
             this.Controls.Add(this.optLiguria);
             this.Controls.Add(this.lblStato);
             this.Controls.Add(this.pnlCFRefertante);
@@ -291,10 +515,13 @@
             this.Text = "Statistiche COVID";
             this.Load += new System.EventHandler(this.frmStatCOVID_Load);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.pnlTipoFile.ResumeLayout(false);
             this.pnlTipoFile.PerformLayout();
             this.pnlCFRefertante.ResumeLayout(false);
             this.pnlCFRefertante.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -322,6 +549,26 @@
         private System.Windows.Forms.Panel pnlCFRefertante;
         private System.Windows.Forms.Label lblStato;
         private System.Windows.Forms.RadioButton optLiguria;
+        private System.Windows.Forms.RadioButton optModena;
+        private System.Windows.Forms.RadioButton optParma;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox txtStartProg;
+        private System.Windows.Forms.TextBox txtNetto;
+        private System.Windows.Forms.TextBox txtTicket;
+        private System.Windows.Forms.TextBox txtLordo;
+        private System.Windows.Forms.TextBox txtNumEsami;
+        private System.Windows.Forms.TextBox txtNumImp;
+        private System.Windows.Forms.TextBox txtNumRecord;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox chkVerificaDatiCF;
+        private System.Windows.Forms.RadioButton optSardegna;
     }
 }
 
