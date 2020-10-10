@@ -19,6 +19,7 @@ namespace waCOVID
             Application.SetCompatibleTextRenderingDefault(false);
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT", false);
             Application.Run(new frmStatCOVID());
+
         }
     }
 }

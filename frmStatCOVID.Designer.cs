@@ -69,6 +69,8 @@
             this.txtNumRecord = new System.Windows.Forms.TextBox();
             this.txtStartProg = new System.Windows.Forms.TextBox();
             this.optSardegna = new System.Windows.Forms.RadioButton();
+            this.optTestRapidi = new System.Windows.Forms.RadioButton();
+            this.optCampania = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -174,11 +176,12 @@
             // 
             // pnlTipoFile
             // 
+            this.pnlTipoFile.Controls.Add(this.optTestRapidi);
             this.pnlTipoFile.Controls.Add(this.optSierologici);
             this.pnlTipoFile.Controls.Add(this.optTamponi);
             this.pnlTipoFile.Location = new System.Drawing.Point(12, 8);
             this.pnlTipoFile.Name = "pnlTipoFile";
-            this.pnlTipoFile.Size = new System.Drawing.Size(261, 37);
+            this.pnlTipoFile.Size = new System.Drawing.Size(352, 37);
             this.pnlTipoFile.TabIndex = 9;
             // 
             // optSierologici
@@ -352,7 +355,7 @@
             this.panel2.Controls.Add(this.button1);
             this.panel2.Location = new System.Drawing.Point(12, 224);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1062, 100);
+            this.panel2.Size = new System.Drawing.Size(1062, 96);
             this.panel2.TabIndex = 21;
             // 
             // label7
@@ -473,7 +476,6 @@
             this.txtStartProg.Size = new System.Drawing.Size(100, 22);
             this.txtStartProg.TabIndex = 21;
             this.txtStartProg.Text = "6";
-            this.txtStartProg.TextChanged += new System.EventHandler(this.txtStartProg_TextChanged);
             // 
             // optSardegna
             // 
@@ -486,11 +488,34 @@
             this.optSardegna.Text = "SARDEGNA";
             this.optSardegna.UseVisualStyleBackColor = true;
             // 
+            // optTestRapidi
+            // 
+            this.optTestRapidi.AutoSize = true;
+            this.optTestRapidi.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optTestRapidi.Location = new System.Drawing.Point(228, 3);
+            this.optTestRapidi.Name = "optTestRapidi";
+            this.optTestRapidi.Size = new System.Drawing.Size(101, 20);
+            this.optTestRapidi.TabIndex = 9;
+            this.optTestRapidi.Text = "Test rapidi";
+            this.optTestRapidi.UseVisualStyleBackColor = true;
+            // 
+            // optCampania
+            // 
+            this.optCampania.AutoSize = true;
+            this.optCampania.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optCampania.Location = new System.Drawing.Point(871, 130);
+            this.optCampania.Name = "optCampania";
+            this.optCampania.Size = new System.Drawing.Size(103, 20);
+            this.optCampania.TabIndex = 23;
+            this.optCampania.Text = "CAMPANIA";
+            this.optCampania.UseVisualStyleBackColor = true;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1086, 353);
+            this.Controls.Add(this.optCampania);
             this.Controls.Add(this.optSardegna);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.optModena);
@@ -569,6 +594,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkVerificaDatiCF;
         private System.Windows.Forms.RadioButton optSardegna;
+        private System.Windows.Forms.RadioButton optTestRapidi;
+        private System.Windows.Forms.RadioButton optCampania;
     }
 }
 
