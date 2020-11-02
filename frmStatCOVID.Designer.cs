@@ -39,6 +39,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.chkVerificaDatiCF = new System.Windows.Forms.CheckBox();
             this.pnlTipoFile = new System.Windows.Forms.Panel();
+            this.optTestRapidi = new System.Windows.Forms.RadioButton();
             this.optSierologici = new System.Windows.Forms.RadioButton();
             this.optTamponi = new System.Windows.Forms.RadioButton();
             this.chkFileEsteso = new System.Windows.Forms.CheckBox();
@@ -46,8 +47,8 @@
             this.optEmiliaRomagna = new System.Windows.Forms.RadioButton();
             this.optPiemonte = new System.Windows.Forms.RadioButton();
             this.chkCFRefertante = new System.Windows.Forms.CheckBox();
-            this.txtCFRefertante = new System.Windows.Forms.TextBox();
             this.pnlCFRefertante = new System.Windows.Forms.Panel();
+            this.cmbCFRefertante = new System.Windows.Forms.ComboBox();
             this.lblStato = new System.Windows.Forms.Label();
             this.optLiguria = new System.Windows.Forms.RadioButton();
             this.optModena = new System.Windows.Forms.RadioButton();
@@ -69,7 +70,6 @@
             this.txtNumRecord = new System.Windows.Forms.TextBox();
             this.txtStartProg = new System.Windows.Forms.TextBox();
             this.optSardegna = new System.Windows.Forms.RadioButton();
-            this.optTestRapidi = new System.Windows.Forms.RadioButton();
             this.optCampania = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
@@ -184,6 +184,17 @@
             this.pnlTipoFile.Size = new System.Drawing.Size(352, 37);
             this.pnlTipoFile.TabIndex = 9;
             // 
+            // optTestRapidi
+            // 
+            this.optTestRapidi.AutoSize = true;
+            this.optTestRapidi.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optTestRapidi.Location = new System.Drawing.Point(228, 3);
+            this.optTestRapidi.Name = "optTestRapidi";
+            this.optTestRapidi.Size = new System.Drawing.Size(101, 20);
+            this.optTestRapidi.TabIndex = 9;
+            this.optTestRapidi.Text = "Test rapidi";
+            this.optTestRapidi.UseVisualStyleBackColor = true;
+            // 
             // optSierologici
             // 
             this.optSierologici.AutoSize = true;
@@ -265,25 +276,26 @@
             this.chkCFRefertante.Text = "C.F. Refertante";
             this.chkCFRefertante.UseVisualStyleBackColor = true;
             // 
-            // txtCFRefertante
-            // 
-            this.txtCFRefertante.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCFRefertante.Location = new System.Drawing.Point(144, 16);
-            this.txtCFRefertante.MaxLength = 16;
-            this.txtCFRefertante.Name = "txtCFRefertante";
-            this.txtCFRefertante.Size = new System.Drawing.Size(197, 22);
-            this.txtCFRefertante.TabIndex = 14;
-            this.txtCFRefertante.Text = "RSOLSN69M04G197A";
-            // 
             // pnlCFRefertante
             // 
-            this.pnlCFRefertante.Controls.Add(this.txtCFRefertante);
+            this.pnlCFRefertante.Controls.Add(this.cmbCFRefertante);
             this.pnlCFRefertante.Controls.Add(this.chkCFRefertante);
             this.pnlCFRefertante.Location = new System.Drawing.Point(12, 156);
             this.pnlCFRefertante.Name = "pnlCFRefertante";
             this.pnlCFRefertante.Size = new System.Drawing.Size(364, 63);
             this.pnlCFRefertante.TabIndex = 15;
             this.pnlCFRefertante.Visible = false;
+            // 
+            // cmbCFRefertante
+            // 
+            this.cmbCFRefertante.FormattingEnabled = true;
+            this.cmbCFRefertante.Items.AddRange(new object[] {
+            "RSOLSN69M04G197A",
+            "ZCCLNE59C65L736B"});
+            this.cmbCFRefertante.Location = new System.Drawing.Point(144, 14);
+            this.cmbCFRefertante.Name = "cmbCFRefertante";
+            this.cmbCFRefertante.Size = new System.Drawing.Size(197, 24);
+            this.cmbCFRefertante.TabIndex = 14;
             // 
             // lblStato
             // 
@@ -357,6 +369,7 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1062, 96);
             this.panel2.TabIndex = 21;
+            this.panel2.Visible = false;
             // 
             // label7
             // 
@@ -488,17 +501,6 @@
             this.optSardegna.Text = "SARDEGNA";
             this.optSardegna.UseVisualStyleBackColor = true;
             // 
-            // optTestRapidi
-            // 
-            this.optTestRapidi.AutoSize = true;
-            this.optTestRapidi.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optTestRapidi.Location = new System.Drawing.Point(228, 3);
-            this.optTestRapidi.Name = "optTestRapidi";
-            this.optTestRapidi.Size = new System.Drawing.Size(101, 20);
-            this.optTestRapidi.TabIndex = 9;
-            this.optTestRapidi.Text = "Test rapidi";
-            this.optTestRapidi.UseVisualStyleBackColor = true;
-            // 
             // optCampania
             // 
             this.optCampania.AutoSize = true;
@@ -570,7 +572,6 @@
         private System.Windows.Forms.RadioButton optEmiliaRomagna;
         private System.Windows.Forms.RadioButton optPiemonte;
         private System.Windows.Forms.CheckBox chkCFRefertante;
-        private System.Windows.Forms.TextBox txtCFRefertante;
         private System.Windows.Forms.Panel pnlCFRefertante;
         private System.Windows.Forms.Label lblStato;
         private System.Windows.Forms.RadioButton optLiguria;
@@ -596,6 +597,7 @@
         private System.Windows.Forms.RadioButton optSardegna;
         private System.Windows.Forms.RadioButton optTestRapidi;
         private System.Windows.Forms.RadioButton optCampania;
+        private System.Windows.Forms.ComboBox cmbCFRefertante;
     }
 }
 
