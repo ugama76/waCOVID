@@ -71,6 +71,7 @@
             this.txtStartProg = new System.Windows.Forms.TextBox();
             this.optSardegna = new System.Windows.Forms.RadioButton();
             this.optCampania = new System.Windows.Forms.RadioButton();
+            this.optAntigenici = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -176,12 +177,13 @@
             // 
             // pnlTipoFile
             // 
+            this.pnlTipoFile.Controls.Add(this.optAntigenici);
             this.pnlTipoFile.Controls.Add(this.optTestRapidi);
             this.pnlTipoFile.Controls.Add(this.optSierologici);
             this.pnlTipoFile.Controls.Add(this.optTamponi);
             this.pnlTipoFile.Location = new System.Drawing.Point(12, 8);
             this.pnlTipoFile.Name = "pnlTipoFile";
-            this.pnlTipoFile.Size = new System.Drawing.Size(352, 37);
+            this.pnlTipoFile.Size = new System.Drawing.Size(495, 37);
             this.pnlTipoFile.TabIndex = 9;
             // 
             // optTestRapidi
@@ -512,6 +514,17 @@
             this.optCampania.Text = "CAMPANIA";
             this.optCampania.UseVisualStyleBackColor = true;
             // 
+            // optAntigenici
+            // 
+            this.optAntigenici.AutoSize = true;
+            this.optAntigenici.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optAntigenici.Location = new System.Drawing.Point(350, 3);
+            this.optAntigenici.Name = "optAntigenici";
+            this.optAntigenici.Size = new System.Drawing.Size(94, 20);
+            this.optAntigenici.TabIndex = 10;
+            this.optAntigenici.Text = "Antigenici";
+            this.optAntigenici.UseVisualStyleBackColor = true;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -598,6 +611,7 @@
         private System.Windows.Forms.RadioButton optTestRapidi;
         private System.Windows.Forms.RadioButton optCampania;
         private System.Windows.Forms.ComboBox cmbCFRefertante;
+        private System.Windows.Forms.RadioButton optAntigenici;
     }
 }
 

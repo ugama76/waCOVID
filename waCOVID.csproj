@@ -70,6 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsCSV.cs" />
+    <Compile Include="frmFlussi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFlussi.Designer.cs">
+      <DependentUpon>frmFlussi.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmStatCOVID.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +84,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmFlussi.resx">
+      <DependentUpon>frmFlussi.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmStatCOVID.resx">
       <DependentUpon>frmStatCOVID.cs</DependentUpon>
     </EmbeddedResource>

@@ -13,12 +13,16 @@ namespace waCOVID
         /// Punto di ingresso principale dell'applicazione.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT", false);
-            Application.Run(new frmStatCOVID());
+            if (args.Length==1 && args[0]=="FLUSSI")
+                Application.Run(new frmFlussi());
+            else
+                Application.Run(new frmStatCOVID());
+            
 
         }
     }

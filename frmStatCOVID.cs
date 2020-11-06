@@ -125,12 +125,14 @@ namespace waCOVID
                                         dtCsv.Columns.Add("ASST-Laboratorio"); //add other columns
                                         dtCsv.Columns.Add("Ente_richiedente"); //add other columns
                                         dtCsv.Columns.Add("Data Inizio Sintomi"); //add other columns
+                                        dtCsv.Columns.Add("Data Esecuzione"); //add other columns
                                         dtCsv.Columns.Add("Esito"); //add other columns
                                         dtCsv.Columns.Add("Ospedale di Provenienza"); //add other columns
                                         dtCsv.Columns.Add("Setting"); //add other columns
                                         dtCsv.Columns.Add("Provenienza"); //add other columns
                                         dtCsv.Columns.Add("Materiale"); //add other columns
                                         dtCsv.Columns.Add("BCP"); //add other columns
+                                        dtCsv.Columns.Add("Link epidemiologico"); //add other columns
                                     }
                                     else
                                     {
@@ -164,12 +166,20 @@ namespace waCOVID
                                             else
                                             {
                                                 dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                                //Per i COVRAG dubbi trasforma l'esito in positivo
+                                                if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG" && dr["Esito"].ToString() == "DUBBIO")
+                                                    dr["Esito"] = "POSITIVO";
                                             }
                                             dr["Data Inizio Sintomi"] = "";
+                                            if (optAntigenici.Checked)
+                                                dr["Data Esecuzione"] = dr["Data Ricezione"];
                                             dr["Ospedale di Provenienza"] = "";
                                             if (dr["Punto accesso"].ToString().ToUpper().Contains("MDL"))
                                             {
-                                                dr["Setting"] = optTamponi.Checked ? "15_Mcomp" : "Pri_azi"; //add other columns
+                                                if (optTamponi.Checked || optAntigenici.Checked)
+                                                    dr["Setting"] = "15_Mcomp";
+                                                else
+                                                    dr["Setting"] = "Pri_azi";
                                             }
                                             else
                                             {
@@ -177,13 +187,22 @@ namespace waCOVID
                                                 //if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVR") //come da mail Elena Frontini del 19.06
                                                 //    dr["Setting"] = "Pri_citt";
                                                 //else
-                                                dr["Setting"] = optTamponi.Checked ? "17_territoriale" : "Pri_citt"; //add other columns
-                                            }
-                                            if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG") //Protocollo G1.2020.0030821 del 09/09/2020
-                                                dr["Setting"] = "22_antig";
+                                                //dr["Setting"] = optTamponi.Checked ? "17_territoriale" : "Pri_citt"; //remmato per la delibera 37779 di novembre 2020
+                                                if (optTamponi.Checked || optAntigenici.Checked)
+                                                    dr["Setting"] = "18_altro";
+                                                else
+                                                    dr["Setting"] = "Pri_citt";
 
-                                            dr["Provenienza"] = optTamponi.Checked ? "" : ""; //add other columns
-                                            dr["Materiale"] = optTamponi.Checked ? "BAL TNF" : "";
+                                            }
+
+                                            //Eliminato per la delibera 37779 di novembre 2020
+                                            //if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG") //Protocollo G1.2020.0030821 del 09/09/2020
+                                            //    dr["Setting"] = "22_antig";
+
+                                            dr["Provenienza"] = ""; //add other columns
+                                            dr["Materiale"] = (optTamponi.Checked || optAntigenici.Checked) ? "TNF" : "";
+
+                                            dr["Link epidemiologico"] = "NON NOTO";
 
                                             if (dr["ID_accettazione"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
                                                 dtCsv.Rows.Add(dr); //add other rows  
@@ -1070,8 +1089,9 @@ namespace waCOVID
                 {
                 "590", "591", "592", "593", "594", "595", "596", "597", "598", "599", "600", "601",
                 "602", "603", "604", "605", "606", "607", "608", "609", "610", "611", "612", "613",
-                "614", "615", "616", "617", "618", "619", "620", "670", "672", "673", "674", "680",
-                "681", "685", "686", "IV3" };
+                "614", "615", "616", "617", "618", "619", "620", "621", "622", "623", "624",
+                "670", "672", "673", "674", "675", "680", "681", "685", "686", "IV3", "CES", "CRG",
+                "MCE", "MPS", "MYM", "PSG", "SCE", "SGR"};
 
                 var lstBCP_ER = new List<string>
                 {
@@ -1205,6 +1225,7 @@ namespace waCOVID
                                 case "CNI":
                                 case "INDET":
                                 case "INCO":
+                                case "MC":
                                     tmpRis = "ANNULLATO";
                                     break;
                             }
@@ -1243,6 +1264,7 @@ namespace waCOVID
                             case "..":
                             case "ANN":
                             case "CNV":
+                            case "MC":
                                 tmpRis = "ANNULLATO";
                                 break;
                         }
@@ -1610,18 +1632,29 @@ namespace waCOVID
 
                     if (chkFileEsteso.Checked == false)
                     {
-                        dv.RowFilter = "BCP='" + (optTradate.Checked ? optTradate.Text : optViadana.Text) + "' AND Esito<>'ANNULLATO' AND Cognome<>'PROVA'";
+                        string sFiltro = "BCP='" + (optTradate.Checked ? optTradate.Text : optViadana.Text) + "' AND Esito<>'ANNULLATO' AND Cognome<>'PROVA'";
+                        if (optTamponi.Checked)
+                            sFiltro += " AND Test_utilizzato LIKE 'COVID %'";
+                        else if (optAntigenici.Checked)
+                            sFiltro += " AND Test_utilizzato LIKE 'COVRAG %'";
+
+                        dv.RowFilter = sFiltro;
                         dtDataTable = dv.ToTable();
 
-                        if (optSierologici.Checked)
+                        if (optSierologici.Checked || optTestRapidi.Checked)
                         {
                             dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "ID_accettazione", "Nome", "Cognome", "Data nascita", "CF", "Data_Ricezione", "Data Referto",
                                 "Ente_richiedente", "Esito", "Telefono_Paziente", "Test_utilizzato", "Setting", "Provenienza");
                         }
-                        else
+                        else if (optTamponi.Checked)
                         {
                             dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "ID_accettazione", "Nome", "Cognome", "Data nascita", "Sesso", "Comune Domicilio", "Data Inizio Sintomi",
                                 "Data Ricezione", "Data Referto", "Ospedale di Provenienza", "Esito", "CF", "Telefono_Paziente", "Setting", "Provenienza", "Materiale");
+                        }
+                        else if (optAntigenici.Checked)
+                        {
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "ID_accettazione", "Nome", "Cognome", "Data nascita", "Sesso", "Comune Domicilio", "Data Inizio Sintomi",
+                                "Data Esecuzione", "Ospedale di Provenienza", "Esito", "CF", "Telefono_Paziente", "Setting", "Provenienza", "Materiale", "Link epidemiologico");
                         }
                     }
                     break;
@@ -1812,17 +1845,20 @@ namespace waCOVID
             if (lblFileOrigine.Text.Trim() != "")
             {
                 DataTable dt = ReadCsvFile(tmpTipo);
-
+                string sFileName = "";
                 switch (tmpTipo)
                 {
                     case enumTipoTracciato.ATS:
-
+                        sFileName = Path.GetDirectoryName(Application.ExecutablePath) + (chkFileEsteso.Checked ? "\\JLab " : "\\ATS ");
+                        if (optTamponi.Checked)
+                            sFileName += "Tamponi ";
+                        else if (optSierologici.Checked || optTestRapidi.Checked)
+                            sFileName += "Sierologici ";
+                        else if (optAntigenici.Checked)
+                            sFileName += "Antigenici ";
+                        sFileName += (optTradate.Checked ? "TRADATE" : "VIADANA") + ".CSV";
                         //Filtrare i dati con le condizioni
-                        WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
-                            + (chkFileEsteso.Checked ? "\\JLab " : "\\ATS ")
-                            + (optTamponi.Checked ? "Tamponi " : "Sierologici ")
-                            + (optTradate.Checked ? "TRADATE" : "VIADANA")
-                            + ".CSV");
+                        WriteDtToCSV(tmpTipo, dt, sFileName);
                         break;
                     case enumTipoTracciato.AUSLPC:
 
