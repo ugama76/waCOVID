@@ -39,6 +39,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.chkVerificaDatiCF = new System.Windows.Forms.CheckBox();
             this.pnlTipoFile = new System.Windows.Forms.Panel();
+            this.optAntigenici = new System.Windows.Forms.RadioButton();
             this.optTestRapidi = new System.Windows.Forms.RadioButton();
             this.optSierologici = new System.Windows.Forms.RadioButton();
             this.optTamponi = new System.Windows.Forms.RadioButton();
@@ -71,7 +72,6 @@
             this.txtStartProg = new System.Windows.Forms.TextBox();
             this.optSardegna = new System.Windows.Forms.RadioButton();
             this.optCampania = new System.Windows.Forms.RadioButton();
-            this.optAntigenici = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -185,6 +185,17 @@
             this.pnlTipoFile.Name = "pnlTipoFile";
             this.pnlTipoFile.Size = new System.Drawing.Size(495, 37);
             this.pnlTipoFile.TabIndex = 9;
+            // 
+            // optAntigenici
+            // 
+            this.optAntigenici.AutoSize = true;
+            this.optAntigenici.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optAntigenici.Location = new System.Drawing.Point(350, 3);
+            this.optAntigenici.Name = "optAntigenici";
+            this.optAntigenici.Size = new System.Drawing.Size(94, 20);
+            this.optAntigenici.TabIndex = 10;
+            this.optAntigenici.Text = "Antigenici";
+            this.optAntigenici.UseVisualStyleBackColor = true;
             // 
             // optTestRapidi
             // 
@@ -371,7 +382,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1062, 96);
             this.panel2.TabIndex = 21;
-            this.panel2.Visible = false;
             // 
             // label7
             // 
@@ -513,17 +523,6 @@
             this.optCampania.TabIndex = 23;
             this.optCampania.Text = "CAMPANIA";
             this.optCampania.UseVisualStyleBackColor = true;
-            // 
-            // optAntigenici
-            // 
-            this.optAntigenici.AutoSize = true;
-            this.optAntigenici.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optAntigenici.Location = new System.Drawing.Point(350, 3);
-            this.optAntigenici.Name = "optAntigenici";
-            this.optAntigenici.Size = new System.Drawing.Size(94, 20);
-            this.optAntigenici.TabIndex = 10;
-            this.optAntigenici.Text = "Antigenici";
-            this.optAntigenici.UseVisualStyleBackColor = true;
             // 
             // frmStatCOVID
             // 

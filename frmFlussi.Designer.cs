@@ -54,11 +54,13 @@
             this.txtStartProg = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.chkMedico = new System.Windows.Forms.CheckBox();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.chkMedico);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.cmbTracciato);
             this.panel2.Controls.Add(this.cmdReset);
@@ -109,11 +111,13 @@
             this.cmbTracciato.FormattingEnabled = true;
             this.cmbTracciato.Items.AddRange(new object[] {
             "Veneto",
-            "Lazio"});
+            "Lazio",
+            "Toscana"});
             this.cmbTracciato.Location = new System.Drawing.Point(10, 35);
             this.cmbTracciato.Name = "cmbTracciato";
             this.cmbTracciato.Size = new System.Drawing.Size(328, 24);
             this.cmbTracciato.TabIndex = 43;
+            this.cmbTracciato.SelectedIndexChanged += new System.EventHandler(this.cmbTracciato_SelectedIndexChanged);
             // 
             // cmdReset
             // 
@@ -368,6 +372,18 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // chkMedico
+            // 
+            this.chkMedico.AutoSize = true;
+            this.chkMedico.Checked = true;
+            this.chkMedico.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkMedico.Location = new System.Drawing.Point(344, 37);
+            this.chkMedico.Name = "chkMedico";
+            this.chkMedico.Size = new System.Drawing.Size(146, 20);
+            this.chkMedico.TabIndex = 45;
+            this.chkMedico.Text = "Aggiorna ID Medico";
+            this.chkMedico.UseVisualStyleBackColor = true;
+            // 
             // frmFlussi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -414,5 +430,6 @@
         private System.Windows.Forms.Button cmdReset;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cmbTracciato;
+        private System.Windows.Forms.CheckBox chkMedico;
     }
 }

@@ -145,6 +145,7 @@ namespace waCOVID
             txtNetto.Text = Netto.ToString("#.##");
 
         }
+
         private void ElaboraLazio()
         {
             if (chkRinumera.Checked)
@@ -210,7 +211,7 @@ namespace waCOVID
                                 progressBar1.Refresh();
                             }
                         }
-                        
+
                     }
                 }
                 //Elimina il file di partenza e rinomina il file .num 
@@ -231,6 +232,55 @@ namespace waCOVID
             }
         }
 
+        private void ElaboraToscana()
+        {
+            string tempLineValue;
+            int Prog = int.Parse("0" + txtStartProg.Text);
+            int NRec = 0;
+
+            AzzeraContatori();
+            string sMergeFileName = chkUnisci.Checked ? Path.GetDirectoryName(lblFile1.Text) + "\\merge\\" + Path.GetFileName(lblFile1.Text) : lblFile1.Text;
+
+            using (FileStream inputStream = File.OpenRead(sMergeFileName))
+            {
+                using (StreamReader inputReader = new StreamReader(inputStream))
+                {
+                    Stream baseStream = inputReader.BaseStream;
+                    long length = baseStream.Length;
+
+
+                    using (StreamWriter outputWriter = File.AppendText(sMergeFileName + ".num"))
+                    {
+                        while (null != (tempLineValue = inputReader.ReadLine()))
+                        {
+                            var aStringBuilder = new StringBuilder(tempLineValue);
+                            NRec += 1;
+                            //Se è stato selezionato l'aggiornamento del medico inserisce i 24 zeri
+                            if (lblFile1.Text.IndexOf("SPA1") > 0 && chkMedico.Checked)
+                            {
+                                aStringBuilder.Remove(279, 24);
+                                aStringBuilder.Insert(279, new string('0', 24));
+                            }
+                            Prog += 1;
+                            tempLineValue = aStringBuilder.ToString();
+                            outputWriter.WriteLine(tempLineValue);
+
+                            progressBar1.Value = (int)(baseStream.Position / length * 100);
+                            progressBar1.Refresh();
+                        }
+                    }
+
+                }
+
+                //Elimina il file di partenza e rinomina il file.num
+                if (File.Exists(sMergeFileName + ".num"))
+                {
+                    File.Delete(sMergeFileName);
+                    File.Move(sMergeFileName + ".num", sMergeFileName);
+                }
+
+            }
+        }
         private static void CombineMultipleFilesIntoSingleFile(string inputDirectoryPath, string[] inputFilePaths, string outputFilePath)
         {
             Console.WriteLine("Number of files: {0}.", inputFilePaths.Length);
@@ -270,6 +320,10 @@ namespace waCOVID
                 case "Lazio":
                     ElaboraLazio();
                     break;
+                case "Toscana":
+                    ElaboraToscana();
+                    break;
+
             }
             MessageBox.Show("Elaborazione terminata!", "INFO", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -281,6 +335,16 @@ namespace waCOVID
             System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
             this.Text += " " + version;
+        }
+
+        private void cmbTracciato_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            AggiornaCampi();
+        }
+
+        private void AggiornaCampi()
+        {
+            chkMedico.Visible = cmbTracciato.Text == "Toscana";
         }
     }
 }

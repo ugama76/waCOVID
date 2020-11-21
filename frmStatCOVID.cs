@@ -167,19 +167,30 @@ namespace waCOVID
                                             {
                                                 dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
                                                 //Per i COVRAG dubbi trasforma l'esito in positivo
-                                                if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG" && dr["Esito"].ToString() == "DUBBIO")
+                                                if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG" && (dr["Esito"].ToString() == "DUBBIO" || dr["Esito"].ToString() == "DEBOLMENTE POSITIVO"))
                                                     dr["Esito"] = "POSITIVO";
                                             }
                                             dr["Data Inizio Sintomi"] = "";
                                             if (optAntigenici.Checked)
                                                 dr["Data Esecuzione"] = dr["Data Ricezione"];
-                                            dr["Ospedale di Provenienza"] = "";
+
+                                            //16.11 post segnalazione report ATS
+                                            if (dr["Telefono_Paziente"].ToString().Trim() == "")
+                                            {
+                                                if (dr["Tel.Abitazione"].ToString().Trim() != "")
+                                                    dr["Telefono_Paziente"] = dr["Tel.Abitazione"];
+                                                else if (dr["Tel.Lavoro"].ToString().Trim() != "")
+                                                    dr["Telefono_Paziente"] = dr["Tel.Lavoro"];
+                                            }
+
+                                            dr["Ospedale di Provenienza"] = dr["Reparto"].ToString(); //16.11 post segnalazione report ATS
+                                            
                                             if (dr["Punto accesso"].ToString().ToUpper().Contains("MDL"))
                                             {
                                                 if (optTamponi.Checked || optAntigenici.Checked)
                                                     dr["Setting"] = "15_Mcomp";
                                                 else
-                                                    dr["Setting"] = "Pri_azi";
+                                                    dr["Setting"] = "7_Pri_azi";
                                             }
                                             else
                                             {
@@ -189,17 +200,20 @@ namespace waCOVID
                                                 //else
                                                 //dr["Setting"] = optTamponi.Checked ? "17_territoriale" : "Pri_citt"; //remmato per la delibera 37779 di novembre 2020
                                                 if (optTamponi.Checked || optAntigenici.Checked)
-                                                    dr["Setting"] = "18_altro";
+                                                    dr["Setting"] = "13_PZ_sin";
                                                 else
-                                                    dr["Setting"] = "Pri_citt";
+                                                    dr["Setting"] = "6_Pri_citt ";
 
                                             }
 
                                             //Eliminato per la delibera 37779 di novembre 2020
                                             //if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG") //Protocollo G1.2020.0030821 del 09/09/2020
-                                            //    dr["Setting"] = "22_antig";
+                                            ////    dr["Setting"] = "22_antig";
+                                            //if (dr["ATS"].ToString().ToString() != "")
+                                            //    dr["Provenienza"] = "ALTRO ATS " + dr["ATS"].ToString(); //16.11.2020 ATS di riferimento territoriale - post segnalazione report ATS
+                                            //else
+                                            dr["Provenienza"] = GetATSJLab(dr["ATS"].ToString());  //16.11.2020 ATS di riferimento territoriale - post segnalazione report ATS
 
-                                            dr["Provenienza"] = ""; //add other columns
                                             dr["Materiale"] = (optTamponi.Checked || optAntigenici.Checked) ? "TNF" : "";
 
                                             dr["Link epidemiologico"] = "NON NOTO";
@@ -555,11 +569,30 @@ namespace waCOVID
                                                                 //RSOLSN69M04G197A CF di Alessandro Rosa
                                         if (cmbCFRefertante.Text == "ZCCLNE59C65L736B")
                                         {
-                                            //ASL di Cuneo
                                             dr["tipoRichiesta"] = "00"; //SORVEGLIANZA TERRITORIALE
-                                            dr["descrStruttura"] = "Rete Diagnostica Italiana S.r.l.";
-                                            dr["aslAppartenenza"] = "211"; //Cuneo 2
-                                            dr["idAsr"] = "211"; //Cuneo 2
+                                            switch (dr["Reparto"].ToString().Trim())
+                                            {
+                                                //ASL di Cuneo 1 e Azienda Ospedaliera S. Croce e Carle
+                                                case "ASLCN1":
+                                                case "CROCE":
+                                                    dr["descrStruttura"] = "Rete Diagnostica Italiana S.r.l.";
+                                                    dr["aslAppartenenza"] = "210"; //Cuneo 1
+                                                    dr["idAsr"] = "210"; //Cuneo 1
+                                                    break;
+                                                case "ASLCN2":
+                                                    //ASL di Cuneo 2
+                                                    dr["descrStruttura"] = "Rete Diagnostica Italiana S.r.l.";
+                                                    dr["aslAppartenenza"] = "211"; //Cuneo 2
+                                                    dr["idAsr"] = "211"; //Cuneo 2
+                                                    break;
+                                                //ASL Città di Torino
+                                                case "ASLTO":
+                                                    dr["descrStruttura"] = "Rete Diagnostica Italiana S.r.l.";
+                                                    dr["aslAppartenenza"] = "301"; //Città di Torino
+                                                    dr["idAsr"] = "301"; //Città di Torino
+                                                    break;
+                                            }
+
                                         }
                                         else
                                         {
@@ -668,7 +701,6 @@ namespace waCOVID
                                         if (dr["CODICE_FISCALE"].ToString() == ""
                                             || dr["DESC_PROVENIENZA_CAMPIONE"].ToString().IndexOf("TOSCANA LIFEBRAIN") > -1)
                                         {
-                                            progressBar1.Value += 1;
                                             continue;
                                         }
                                         dr["ID_RICHIESTA_PK"] = Right(("00000" + dr["ID_RICHIESTA_PK"].ToString()), 5);
@@ -692,7 +724,7 @@ namespace waCOVID
                                             dr["DESC_ANALISI"] = tmpEsame.Substring(tmpEsame.IndexOf(" "));
                                         dr["DESC_ESITO"] = dr["DESC_ANALISI"];
                                         dr["PROG_ESITO"] = "1";
-                                        if (dr["CODICE_ANALISI"].ToString() == "COVID")
+                                        if (dr["CODICE_ANALISI"].ToString() == "COVID" || dr["CODICE_ANALISI"].ToString() == "COVRAG")
                                         {
                                             /* Commentata come da mail inviata da A.Li.Sa. del 08/09/2020 Tutte le righe identificate con 88820 RETE DIAGNOSTICA ITALIANA  devono essere cambiate in 88812 LIFEBRAIN LIGURIA. 
                                             //RNA TAMPONI
@@ -1080,7 +1112,38 @@ namespace waCOVID
             }
             return tmpStru;
         }
-
+        private string GetATSJLab(string prmDescAslJlLab)
+        {
+            string tmpATS = prmDescAslJlLab;
+            if (tmpATS != "")
+            {
+                switch (tmpATS.Trim().ToUpper())
+                {
+                    case "LOMBARDIA 321 - ATS  CITTÀ METROPOLITANA DI MILANO":
+                        tmpATS = "ALTRO ATS DELLA CITTA' METROPOLITANA DI MILANO";
+                        break;
+                    case "LOMBARDIA 323 - ATS DELLA MONTAGNA":
+                        tmpATS = "ALTRO ATS DELLA MONTAGNA";
+                        break;
+                    case "LOMBARDIA 324 - ATS DELLA BRIANZA":
+                        tmpATS = "ALTRO ATS DELLA MONTAGNA";
+                        break;
+                    case "LOMBARDIA 325 - ATS DI BERGAMO":
+                        tmpATS = "ALTRO ATS DI BERGAMO";
+                        break;
+                    case "LOMBARDIA 326 - A.T.S.BRESCIA":
+                        tmpATS = "ALTRO ATS DI BRESCIA";
+                        break;
+                    case "LOMBARDIA 327 - ATS DELLA VAL PADANA":
+                        tmpATS = "ALTRO ATS DELLA VAL PADANA";
+                        break;
+                    case "LOMBARDIA 328 - ATS DI PAVIA":
+                        tmpATS = "ALTRO ATS DI PAVIA";
+                        break;
+                }
+            }
+            return tmpATS;
+        }
         private string GetLabRif(string prmBCP)
         {
             if (prmBCP.Trim() != "")
@@ -1255,9 +1318,13 @@ namespace waCOVID
                             case "POS":
                                 tmpRis = "POSITIVO";
                                 break;
+                            case "00067":
                             case "00074":
                             case "DEBOP":
-                                tmpRis = "DUBBIO";
+                                if (tmpEsame == "COVRAG")
+                                    tmpRis = "DEBOLMENTE POSITIVO";
+                                else
+                                    tmpRis = "DUBBIO";
                                 break;
                             case "":
                             case ".":
@@ -1447,6 +1514,9 @@ namespace waCOVID
                         {
                             case "COVID": //Tampone
                                 tmpCodCUR = "C02238600";
+                                break;
+                            case "COVRAG": //Tampone antigenico rapido
+                                tmpCodCUR = "C02254000";
                                 break;
                             case "COVRAP": //Test rapido
                                 break;
@@ -2012,7 +2082,7 @@ namespace waCOVID
                 optModena.Checked = true;
             else if (lblFileOrigine.Text.IndexOf("COSAR") > 0)
                 optSardegna.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COASL") > 0)
+            else if (lblFileOrigine.Text.IndexOf("COASL") > 0 || lblFileOrigine.Text.IndexOf("COALE") > 0)
                 optPiemonte.Checked = true;
             else if (lblFileOrigine.Text.IndexOf("ALISA") > 0)
                 optLiguria.Checked = true;
@@ -2085,10 +2155,10 @@ namespace waCOVID
                                 NRec += 1;
                                 //aStringBuilder.Remove(28, 20);
                                 //aStringBuilder.Insert(28, "60830120200801" + Prog.ToString("000000")); //Citotest
-                                //aStringBuilder.Insert(28, "20200050640801" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(28, "56308920200801" + Prog.ToString("000000")); //Selab
+                                //aStringBuilder.Insert(28, "20200050641001" + Prog.ToString("000000")); //Fleming
+                                //aStringBuilder.Insert(28, "56308920201001" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(28, "60580220200901" + Prog.ToString("000000")); //CMV
-                                //aStringBuilder.Insert(28, "64214520200801" + Prog.ToString("000000")); //Emolab
+                                //aStringBuilder.Insert(28, "20206421451001" + Prog.ToString("000000")); //Emolab
                                 if (tempLineValue.Substring(48, 2) == "99")
                                 {
                                     NImp += 1;
@@ -2121,10 +2191,10 @@ namespace waCOVID
                             {
                                 //aStringBuilder.Remove(25, 20);
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
-                                //aStringBuilder.Insert(25, "20200050640801" + Prog.ToString("000000")); //Fleming
+                                //aStringBuilder.Insert(25, "20200050641001" + Prog.ToString("000000")); //Fleming
                                 //aStringBuilder.Insert(25, "56308920200801" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(25, "60580220200901" + Prog.ToString("000000")); //CMV
-                                //aStringBuilder.Insert(25, "64214520200801" + Prog.ToString("000000")); //Emolab
+                                //aStringBuilder.Insert(25, "20206421451001" + Prog.ToString("000000")); //Emolab
 
                                 Prog += 1;
                             }
