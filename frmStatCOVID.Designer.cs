@@ -72,6 +72,7 @@
             this.txtStartProg = new System.Windows.Forms.TextBox();
             this.optSardegna = new System.Windows.Forms.RadioButton();
             this.optCampania = new System.Windows.Forms.RadioButton();
+            this.optPuglia = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -107,7 +108,7 @@
             // cmdGeneraFile
             // 
             this.cmdGeneraFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmdGeneraFile.Location = new System.Drawing.Point(750, 168);
+            this.cmdGeneraFile.Location = new System.Drawing.Point(750, 187);
             this.cmdGeneraFile.Name = "cmdGeneraFile";
             this.cmdGeneraFile.Size = new System.Drawing.Size(213, 27);
             this.cmdGeneraFile.TabIndex = 3;
@@ -119,7 +120,7 @@
             // 
             this.progressBar1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.progressBar1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.progressBar1.Location = new System.Drawing.Point(0, 330);
+            this.progressBar1.Location = new System.Drawing.Point(0, 346);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(1086, 23);
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
@@ -235,7 +236,7 @@
             // chkFileEsteso
             // 
             this.chkFileEsteso.AutoSize = true;
-            this.chkFileEsteso.Location = new System.Drawing.Point(751, 197);
+            this.chkFileEsteso.Location = new System.Drawing.Point(751, 216);
             this.chkFileEsteso.Name = "chkFileEsteso";
             this.chkFileEsteso.Size = new System.Drawing.Size(141, 20);
             this.chkFileEsteso.TabIndex = 9;
@@ -312,8 +313,9 @@
             // 
             // lblStato
             // 
+            this.lblStato.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblStato.AutoSize = true;
-            this.lblStato.Location = new System.Drawing.Point(9, 229);
+            this.lblStato.Location = new System.Drawing.Point(9, 322);
             this.lblStato.Name = "lblStato";
             this.lblStato.Size = new System.Drawing.Size(0, 16);
             this.lblStato.TabIndex = 16;
@@ -378,10 +380,11 @@
             this.panel2.Controls.Add(this.txtNumRecord);
             this.panel2.Controls.Add(this.txtStartProg);
             this.panel2.Controls.Add(this.button1);
-            this.panel2.Location = new System.Drawing.Point(12, 224);
+            this.panel2.Location = new System.Drawing.Point(12, 242);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1062, 96);
             this.panel2.TabIndex = 21;
+            this.panel2.Visible = false;
             // 
             // label7
             // 
@@ -524,11 +527,23 @@
             this.optCampania.Text = "CAMPANIA";
             this.optCampania.UseVisualStyleBackColor = true;
             // 
+            // optPuglia
+            // 
+            this.optPuglia.AutoSize = true;
+            this.optPuglia.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optPuglia.Location = new System.Drawing.Point(751, 161);
+            this.optPuglia.Name = "optPuglia";
+            this.optPuglia.Size = new System.Drawing.Size(80, 20);
+            this.optPuglia.TabIndex = 24;
+            this.optPuglia.Text = "PUGLIA";
+            this.optPuglia.UseVisualStyleBackColor = true;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1086, 353);
+            this.ClientSize = new System.Drawing.Size(1086, 369);
+            this.Controls.Add(this.optPuglia);
             this.Controls.Add(this.optCampania);
             this.Controls.Add(this.optSardegna);
             this.Controls.Add(this.panel2);
@@ -611,6 +626,7 @@
         private System.Windows.Forms.RadioButton optCampania;
         private System.Windows.Forms.ComboBox cmbCFRefertante;
         private System.Windows.Forms.RadioButton optAntigenici;
+        private System.Windows.Forms.RadioButton optPuglia;
     }
 }
 

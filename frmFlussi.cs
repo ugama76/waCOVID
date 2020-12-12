@@ -12,21 +12,42 @@ namespace waCOVID
 {
     public partial class frmFlussi : Form
     {
-        public frmFlussi()
+        public enum enumRegioni
+        {
+            Tutte = -1,
+            Veneto = 0,
+            Lazio = 1,
+            Toscana = 2,
+        }
+
+        public frmFlussi(enumRegioni prmRegione)
         {
             InitializeComponent();
-            cmbTracciato.SelectedIndex = 0;
+            cmbTracciato.SelectedIndex = (int)prmRegione;
+            cmbTracciato.Enabled = prmRegione == enumRegioni.Tutte;
+
         }
 
         private void cmdSelFile1_Click(object sender, EventArgs e)
         {
             openFileDialog1.ShowDialog();
-            if (((Button)sender).Name == "cmdSelFile1")
-                lblFile1.Text = openFileDialog1.FileName;
-            else
-                lblFile2.Text = openFileDialog1.FileName;
+            switch (((Button)sender).Name)
+            {
+                case "cmdSelFile1":
+                    lblFile1.Text = openFileDialog1.FileName;
+                    break;
+                case "cmdSelFile2":
+                    lblFile2.Text = openFileDialog1.FileName;
+                    break;
+                case "cmdSelFile3":
+                    lblFile3.Text = openFileDialog1.FileName;
+                    break;
+                case "cmdSelFile4":
+                    lblFile4.Text = openFileDialog1.FileName;
+                    break;
+            }
 
-            if (lblFile1.Text.Trim() != "" && lblFile2.Text.Trim() != "")
+            if ((lblFile1.Text.Trim() != "" && lblFile2.Text.Trim() != "") || (lblFile3.Text.Trim() != "" && lblFile4.Text.Trim() != ""))
             {
                 chkUnisci.Checked = true;
                 chkUnisci.Enabled = true;
@@ -43,6 +64,8 @@ namespace waCOVID
         {
             lblFile1.Text = "";
             lblFile2.Text = "";
+            lblFile3.Text = "";
+            lblFile4.Text = "";
             chkUnisci.Checked = false;
             chkUnisci.Enabled = false;
         }
@@ -80,7 +103,7 @@ namespace waCOVID
                         while (null != (tempLineValue = inputReader.ReadLine()))
                         {
                             var aStringBuilder = new StringBuilder(tempLineValue);
-                            if (lblFile1.Text.IndexOf("SPS") > 0)
+                            if (lblFile1.Text.IndexOf("SPS") > -1)
                             {
                                 NRec += 1;
                                 //aStringBuilder.Remove(28, 20);
@@ -117,7 +140,7 @@ namespace waCOVID
 
                                 }
                             }
-                            else if (lblFile1.Text.IndexOf("SPA") > 0)
+                            else if (lblFile1.Text.IndexOf("SPA") > -1)
                             {
                                 //aStringBuilder.Remove(25, 20);
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
@@ -146,7 +169,7 @@ namespace waCOVID
 
         }
 
-        private void ElaboraLazio()
+        private void ElaboraLazio(string prmMergeFileName)
         {
             if (chkRinumera.Checked)
             {
@@ -156,9 +179,10 @@ namespace waCOVID
                 decimal Lordo = 0, Ticket = 0, Netto = 0, ImpLordo = 0, ImpTicket = 0, ImpNetto = 0;
 
                 AzzeraContatori();
-                string sMergeFileName = chkUnisci.Checked ? Path.GetDirectoryName(lblFile1.Text) + "\\merge\\" + Path.GetFileName(lblFile1.Text) : lblFile1.Text;
+                //string sMergeFileName = chkUnisci.Checked ? Application.StartupPath + "\\merged\\" + Path.GetFileName(lblFile3.Text) : lblFile3.Text;
+                //string sMergeFileName = chkUnisci.Checked ? Path.GetDirectoryName(lblFile1.Text) + "\\merges\\" + Path.GetFileName(lblFile1.Text) : lblFile1.Text;
 
-                using (FileStream inputStream = File.OpenRead(sMergeFileName))
+                using (FileStream inputStream = File.OpenRead(prmMergeFileName))
                 {
                     using (StreamReader inputReader = new StreamReader(inputStream))
                     {
@@ -166,7 +190,7 @@ namespace waCOVID
                         long length = baseStream.Length;
 
 
-                        using (StreamWriter outputWriter = File.AppendText(sMergeFileName + ".num"))
+                        using (StreamWriter outputWriter = File.AppendText(prmMergeFileName + ".num"))
                         {
                             while (null != (tempLineValue = inputReader.ReadLine()))
                             {
@@ -175,33 +199,49 @@ namespace waCOVID
                                 aStringBuilder.Remove(0, 7);
                                 aStringBuilder.Insert(0, Prog.ToString("0000000"));
                                 Prog += 1;
+                                int ValNeg = 1;
                                 //Verifica se si tratta del file Sanitario
-                                if (lblFile1.Text.IndexOf("S") > 0)
+                                if (prmMergeFileName.IndexOf("S.TXT") > -1)
                                 {
-                                    if (tempLineValue.Substring(82, 2) == "99")
+                                    try
                                     {
-                                        NImp += 1;
-                                        ImpTicket = decimal.Parse(tempLineValue.Substring(109, 7).Replace(".", ","));
-                                        Ticket += ImpTicket;
-                                        ImpNetto = decimal.Parse(tempLineValue.Substring(116, 7).Replace(".", ","));
-                                        Netto += ImpNetto;
+                                        if (tempLineValue.Substring(82, 2) == "99")
+                                        {
+                                            NImp += 1;
 
-                                        if (ImpLordo - ImpTicket != ImpNetto)
-                                            MessageBox.Show("Riscontrata anomalia Lordo-Ticket<>Netto alla riga: " + NRec.ToString());
-                                        ImpLordo = 0;
-                                        NEsaImp = 0;
+                                            ValNeg = (tempLineValue.Substring(109, 7).IndexOf("-") > -1) ? -1 : 1;
+                                            ImpTicket = ValNeg * decimal.Parse(tempLineValue.Substring(109, 7).Replace(".", ",").Replace("-", "0"));
+                                            Ticket += ImpTicket;
+
+                                            ValNeg = (tempLineValue.Substring(116, 7).IndexOf("-") > -1) ? -1 : 1;
+                                            ImpNetto = ValNeg * decimal.Parse(tempLineValue.Substring(116, 7).Replace(".", ",").Replace("-", "0"));
+                                            Netto += ImpNetto;
+
+                                            if (ImpLordo - ImpTicket != ImpNetto)
+                                                MessageBox.Show("Riscontrata anomalia Lordo-Ticket<>Netto alla riga: " + NRec.ToString());
+                                            ImpLordo = 0;
+                                            NEsaImp = 0;
+                                        }
+                                        else
+                                        {
+                                            NEsaImp += 1;
+                                            if (NEsaImp > 9)
+                                                MessageBox.Show("Superato limite prestazioni alla riga: " + NRec.ToString());
+                                            Qt = int.Parse(tempLineValue.Substring(99, 2));
+                                            if (Qt == 0)
+                                                MessageBox.Show("Riscontrata anomalia Quantità esami=0 alla riga: " + NRec.ToString());
+                                            NEsa += Qt;
+
+                                            ValNeg = (tempLineValue.Substring(116, 7).IndexOf("-") > -1) ? -1 : 1;
+
+                                            ImpLordo += ValNeg * decimal.Parse(tempLineValue.Substring(116, 7).Replace(".", ",").Replace("-", "0"));
+
+                                            Lordo += ValNeg * decimal.Parse(tempLineValue.Substring(116, 7).Replace(".", ",").Replace("-", "0"));
+                                        }
                                     }
-                                    else
+                                    catch (Exception ex)
                                     {
-                                        NEsaImp += 1;
-                                        if (NEsaImp > 9)
-                                            MessageBox.Show("Superato limite prestazioni alla riga: " + NRec.ToString());
-                                        Qt = int.Parse(tempLineValue.Substring(99, 2));
-                                        if (Qt == 0)
-                                            MessageBox.Show("Riscontrata anomalia Quantità esami=0 alla riga: " + NRec.ToString());
-                                        NEsa += Qt;
-                                        ImpLordo += decimal.Parse(tempLineValue.Substring(116, 7).Replace(".", ","));
-                                        Lordo += decimal.Parse(tempLineValue.Substring(116, 7).Replace(".", ","));
+                                        MessageBox.Show("Si è verificato un errore Riga: " + NRec.ToString() + "\r\n" + ex.Message, "ERRORE", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     }
                                 }
                                 tempLineValue = aStringBuilder.ToString();
@@ -215,10 +255,10 @@ namespace waCOVID
                     }
                 }
                 //Elimina il file di partenza e rinomina il file .num 
-                if (File.Exists(sMergeFileName + ".num"))
+                if (File.Exists(prmMergeFileName + ".num"))
                 {
-                    File.Delete(sMergeFileName);
-                    File.Move(sMergeFileName + ".num", sMergeFileName);
+                    File.Delete(prmMergeFileName);
+                    File.Move(prmMergeFileName + ".num", prmMergeFileName);
                 }
 
                 txtNumRecord.Text = NRec.ToString();
@@ -256,7 +296,7 @@ namespace waCOVID
                             var aStringBuilder = new StringBuilder(tempLineValue);
                             NRec += 1;
                             //Se è stato selezionato l'aggiornamento del medico inserisce i 24 zeri
-                            if (lblFile1.Text.IndexOf("SPA1") > 0 && chkMedico.Checked)
+                            if (lblFile1.Text.IndexOf("SPA1") > -1 && chkMedico.Checked)
                             {
                                 aStringBuilder.Remove(279, 24);
                                 aStringBuilder.Insert(279, new string('0', 24));
@@ -300,17 +340,24 @@ namespace waCOVID
 
         private void cmdElabora_Click(object sender, EventArgs e)
         {
+            string sMergeFileNameA = Application.StartupPath + "\\merged";
+            string sMergeFileNameS = sMergeFileNameA;
+
             if (chkUnisci.Checked)
             {
-                string[] tmpFiles = new string[] { lblFile1.Text, lblFile2.Text };
+
+                string[] tmpFilesA = new string[] { lblFile1.Text, lblFile2.Text };
+                string[] tmpFilesS = new string[] { lblFile3.Text, lblFile4.Text };
                 //Crea una sottocartella merge
-                string sMergeFileName = Path.GetDirectoryName(lblFile1.Text) + "\\merge";
-                if (!Directory.Exists(sMergeFileName))
+                //string sMergeFileName = Path.GetDirectoryName(lblFile1.Text) + "\\merged";
+                if (!Directory.Exists(sMergeFileNameA))
                 {
-                    DirectoryInfo di = Directory.CreateDirectory(sMergeFileName);
+                    DirectoryInfo di = Directory.CreateDirectory(sMergeFileNameA);
                 }
-                sMergeFileName += "\\" + Path.GetFileName(lblFile1.Text);
-                CombineMultipleFilesIntoSingleFile(Path.GetDirectoryName(lblFile1.Text), tmpFiles, sMergeFileName);
+                sMergeFileNameA = Application.StartupPath + "\\merged\\" + Path.GetFileName(lblFile1.Text);
+                CombineMultipleFilesIntoSingleFile(Path.GetDirectoryName(lblFile1.Text), tmpFilesA, sMergeFileNameA);
+                sMergeFileNameS = Application.StartupPath + "\\merged\\" + Path.GetFileName(lblFile3.Text);
+                CombineMultipleFilesIntoSingleFile(Path.GetDirectoryName(lblFile3.Text), tmpFilesS, sMergeFileNameS);
             }
             switch (cmbTracciato.Text)
             {
@@ -318,7 +365,8 @@ namespace waCOVID
                     ElaboraVeneto();
                     break;
                 case "Lazio":
-                    ElaboraLazio();
+                    ElaboraLazio(sMergeFileNameA);
+                    ElaboraLazio(sMergeFileNameS);
                     break;
                 case "Toscana":
                     ElaboraToscana();
@@ -345,6 +393,22 @@ namespace waCOVID
         private void AggiornaCampi()
         {
             chkMedico.Visible = cmbTracciato.Text == "Toscana";
+            switch (cmbTracciato.Text)
+            {
+                case "Lazio":
+                    lblEtiFile1.Text = "File A Themix";
+                    lblEtiFile2.Text = "File A JLab";
+                    lblEtiFile3.Text = "File S Themix";
+                    lblEtiFile4.Text = "File S JLab";
+                    break;
+                case "Veneto":
+                case "Toscana":
+                    lblEtiFile1.Text = "File A ";
+                    lblEtiFile2.Text = "File A JLab";
+                    lblEtiFile3.Text = "File S ";
+                    lblEtiFile4.Text = "File S JLab";
+                    break;
+            }
         }
     }
 }

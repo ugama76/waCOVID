@@ -18,11 +18,15 @@ namespace waCOVID
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT", false);
-            if (args.Length==1 && args[0]=="FLUSSI")
-                Application.Run(new frmFlussi());
+            if (args.Length == 1 && args[0] == "FLUSSIVENETO")
+                Application.Run(new frmFlussi(frmFlussi.enumRegioni.Veneto));
+            if (args.Length == 1 && args[0] == "FLUSSILAZIO")
+                Application.Run(new frmFlussi(frmFlussi.enumRegioni.Lazio));
+            else if (args.Length == 1 && args[0] == "FLUSSI")
+                Application.Run(new frmFlussi(frmFlussi.enumRegioni.Tutte));
             else
                 Application.Run(new frmStatCOVID());
-            
+
 
         }
     }

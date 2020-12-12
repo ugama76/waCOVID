@@ -27,10 +27,16 @@ namespace waCOVID
             EMILIA,
             PIEMONTE,
             LIGURIA,
+            LIGURIA_TAR,
             PARMA,
             MODENA,
             SARDEGNA,
-            CAMPANIA
+            CAMPANIA,
+            PUGLIA,
+            PUGLIA_V1,
+            PUGLIA_V2,
+            PUGLIA_DENUNCE_COVID,
+            PUGLIA_DENUNCE_ANTIGENICI,
         }
         private enum enumTipoEsame
         {
@@ -103,6 +109,7 @@ namespace waCOVID
                 using (StreamReader sr = new StreamReader(lblFileOrigine.Text))
                 {
                     int kEsclusi = 0;
+                    int kRecord = 0;
                     while (!sr.EndOfStream)
                     {
                         Fulltext = sr.ReadToEnd().ToString(); //read full file text  
@@ -183,17 +190,25 @@ namespace waCOVID
                                                     dr["Telefono_Paziente"] = dr["Tel.Lavoro"];
                                             }
 
-                                            dr["Ospedale di Provenienza"] = dr["Reparto"].ToString(); //16.11 post segnalazione report ATS
-                                            
+                                            //dr["Ospedale di Provenienza"] = dr["Reparto"].ToString(); //16.11 post segnalazione report ATS
+                                            //
                                             if (dr["Punto accesso"].ToString().ToUpper().Contains("MDL"))
                                             {
+                                                dr["Ospedale di Provenienza"] = dr["Reparto"].ToString(); //16.11 post segnalazione report ATS
+
                                                 if (optTamponi.Checked || optAntigenici.Checked)
                                                     dr["Setting"] = "15_Mcomp";
                                                 else
                                                     dr["Setting"] = "7_Pri_azi";
+
                                             }
                                             else
                                             {
+                                                if (optTradate.Checked) //Mail Nicoletta Fabucci del 18/11 
+                                                    dr["Ospedale di Provenienza"] = "LIFEBRAIN LOMBARDIA SRL - TRADATE"; //16.11 post segnalazione report ATS
+                                                else
+                                                    dr["Ospedale di Provenienza"] = "LIFEBRAIN LOMBARDIA SRL - VIADANA"; //16.11 post segnalazione report ATS
+
                                                 //13.08 Remmato questo if inseguito ad indicazioni di Elena Frontini come mail di lunedì 10/08/2020 14:41
                                                 //if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVR") //come da mail Elena Frontini del 19.06
                                                 //    dr["Setting"] = "Pri_citt";
@@ -701,6 +716,9 @@ namespace waCOVID
                                         if (dr["CODICE_FISCALE"].ToString() == ""
                                             || dr["DESC_PROVENIENZA_CAMPIONE"].ToString().IndexOf("TOSCANA LIFEBRAIN") > -1)
                                         {
+                                            kEsclusi += 1;
+                                            lblStato.Text = "Risultati esclusi (senza C.F. o reparto TOSCANA LIFEBRAIN): " + kEsclusi.ToString();
+                                            lblStato.Refresh();
                                             continue;
                                         }
                                         dr["ID_RICHIESTA_PK"] = Right(("00000" + dr["ID_RICHIESTA_PK"].ToString()), 5);
@@ -731,7 +749,7 @@ namespace waCOVID
                                             dr["AZIENDA_INVIANTE"] = "88820";
                                             dr["DESC_AZIENDA_INVIANTE"] = "RETE DIAGNOSTICA ITALIANA";
                                             */
-                                            //Sierologici
+                                            bool bTamponeMolecolare = dr["CODICE_ANALISI"].ToString() == "COVID";
                                             dr["AZIENDA_INVIANTE"] = "88812";
                                             dr["DESC_AZIENDA_INVIANTE"] = "LIFEBRAIN LIGURIA";
 
@@ -740,16 +758,22 @@ namespace waCOVID
                                             switch (dr["RISULTATO_NUMERO"].ToString())
                                             {
                                                 case "POSITIVO":
-                                                    dr["RISULTATO_NUMERO"] = "1";
+                                                    dr["RISULTATO_NUMERO"] = bTamponeMolecolare ? "1" : "21";
+                                                    if (!bTamponeMolecolare)
+                                                        dr["DESC_RISULTATO"] = "RILEVATO";
                                                     break;
                                                 case "NEGATIVO":
-                                                    dr["RISULTATO_NUMERO"] = "2";
+                                                    dr["RISULTATO_NUMERO"] = bTamponeMolecolare ? "2" : "22";
+                                                    if (!bTamponeMolecolare)
+                                                        dr["DESC_RISULTATO"] = "NON RILEVATO";
                                                     break;
                                                 case "DEBOLMENTE POSITIVO":
-                                                    dr["RISULTATO_NUMERO"] = "3";
+                                                    dr["RISULTATO_NUMERO"] = bTamponeMolecolare ? "3" : "";
+                                                    if (!bTamponeMolecolare)
+                                                        dr["DESC_RISULTATO"] = "";
                                                     break;
                                                 case "ANNULATO":
-                                                    dr["RISULTATO_NUMERO"] = "4";
+                                                    dr["RISULTATO_NUMERO"] = bTamponeMolecolare ? "4" : "23";
                                                     dr["DESC_RISULTATO"] = "INDETERMINATO";
                                                     break;
                                                 default:
@@ -819,6 +843,7 @@ namespace waCOVID
                                     }
                                     else
                                     {
+                                        kRecord += 1;
                                         DataRow dr = dtCsv.NewRow();
                                         for (int k = 0; k < rowValues.Count(); k++)
                                         {
@@ -828,7 +853,8 @@ namespace waCOVID
 
                                         dr["regione"] = "200";
                                         dr["azienda"] = "201";
-                                        dr["laboratorio"] = "001737";
+                                        //dr["laboratorio"] = "001737";
+                                        dr["laboratorio"] = "120140";
 
                                         dr["provenienza"] = new string(' ', 8);
                                         dr["tipo_provenienza"] = " ";
@@ -847,7 +873,7 @@ namespace waCOVID
                                         else
                                             dNas = DateTime.Now.Date;
 
-                                        dr["id"] = (dNas.ToString("yyyy") + dr["id"].ToString()).PadRight(16, ' ');
+                                        dr["id"] = (dNas.ToString("yyyyMMdd") + ("0000" + dr["Prog"].ToString()).Substring(("0000" + dr["Prog"].ToString()).Length - 4, 4)) + kRecord.ToString("0000");
 
                                         dr["cognome"] = dr["cognome"].ToString().PadRight(30, ' ').Substring(0, 30);
                                         dr["nome"] = dr["nome"].ToString().PadRight(20, ' ').Substring(0, 20);
@@ -1031,6 +1057,103 @@ namespace waCOVID
                                         }
                                     }
                                     break;
+                                case enumTipoTracciato.PUGLIA:
+                                    if (i == 0)
+                                    {
+                                        for (int j = 0; j < rowValues.Count(); j++)
+                                        {
+                                            dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
+                                        }
+                                        //if (lblFileOrigine.Text.IndexOf("COVDE") > -1 || lblFileOrigine.Text.IndexOf("ANTDE") > -1)
+                                        //    dtCsv.Columns.Add("NUMERO RICHIESTA"); //add other columns
+                                        dtCsv.Columns.Add("CODICE TIPO ESAME"); //add other columns
+                                        dtCsv.Columns.Add("CODICE LABORATORIO"); //add other columns
+                                        dtCsv.Columns.Add("PROGRESSIVO ESAME"); //add other columns
+                                        dtCsv.Columns.Add("STRUTTURA RICHIEDENTE"); //add other columns
+                                        dtCsv.Columns.Add("ESITO ESAME"); //add other columns
+                                        dtCsv.Columns.Add("TIPO TEST"); //add other columns
+                                        dtCsv.Columns.Add("Esito"); //add other columns
+
+                                        dtCsv.Columns.Add("TEST MOLECOLARE DOPO ANTIGENICO"); //add other columns
+                                        dtCsv.Columns.Add("MOTIVO DELLA RICHIESTA"); //add other columns
+                                        dtCsv.Columns.Add("PAZIENTE FUORI REGIONE"); //add other columns
+                                        //Colonne per il file delle denunce
+                                        dtCsv.Columns.Add("NOME"); //add other columns
+                                        dtCsv.Columns.Add("COGNOME"); //add other columns
+                                        dtCsv.Columns.Add("DATA DI NASCITA"); //add other columns
+                                        dtCsv.Columns.Add("CODICE FISCALE"); //add other columns
+                                        dtCsv.Columns.Add("ALL'ATTO DEL PRELIEVO"); //add other columns
+                                        dtCsv.Columns.Add("CITTA'"); //add other columns
+                                        dtCsv.Columns.Add("TELEFONO"); //add other columns
+                                        dtCsv.Columns.Add("TELEFONO FISSO"); //add other columns
+                                        dtCsv.Columns.Add("PROVENIENZA"); //add other columns
+                                        dtCsv.Columns.Add("E-MAIL"); //add other columns
+                                    }
+                                    else
+                                    {
+                                        DataRow dr = dtCsv.NewRow();
+                                        for (int k = 0; k < rowValues.Count(); k++)
+                                        {
+                                            dr[k] = rowValues[k].ToString().Trim();
+                                        }
+                                        dr["CODICE TIPO ESAME"] = "700"; //Esame ordinario
+                                        dr["CODICE LABORATORIO"] = "15";
+                                        dr["PROGRESSIVO ESAME"] = "";
+                                        dr["PAZIENTE AL PRELIEVO"] = dr["PAZIENTE AL PRELIEVO"].ToString().Replace("<p>", "").Replace("</p>", "").Trim();
+                                        dr["STRUTTURA RICHIEDENTE"] = "Lifebrain Lecce Srl";
+
+                                        //Riassegna le colonne per le denunce
+                                        dr["NOME"] = dr["NOME PAZIENTE"];
+                                        dr["COGNOME"] = dr["COGNOME PAZIENTE"];
+                                        dr["DATA DI NASCITA"] = dr["DATA NASCITA PAZIENTE"];
+                                        dr["CODICE FISCALE"] = dr["CODICE FISCALE O STP O ENI PAZIENTE"];
+                                        dr["ALL'ATTO DEL PRELIEVO"] = dr["PAZIENTE AL PRELIEVO"];
+                                        dr["CITTA'"] = dr["RESIDENZA"];
+                                        dr["TELEFONO"] = dr["TELEFONO MOBILE PAZIENTE"];
+                                        dr["TELEFONO FISSO"] = dr["TELEFONO FISSO PAZIENTE"];
+                                        dr["PROVENIENZA"] = "LABORATORIO ANALISI PIGNATELLI SRL";
+                                        dr["E-MAIL"] = dr["RECAPITO E-MAIL PAZIENTE"];
+
+                                        if (dr["PAZIENTE AL PRELIEVO"].ToString().IndexOf("SINTOMATICO") == 0 || dr["PAZIENTE AL PRELIEVO"].ToString().IndexOf("PAUCISINTOMATICO") > -1)
+                                            dr["PAZIENTE AL PRELIEVO"] = "100";
+                                        else
+                                            dr["PAZIENTE AL PRELIEVO"] = "101";
+
+                                        tmpEsame = dr["Test_utilizzato"].ToString().Substring(0, dr["Test_utilizzato"].ToString().IndexOf(" "));
+                                        if (tmpEsame == "COVID" || tmpEsame == "COVRAG") //TAMPONI
+                                        {
+                                            dr["Esito"] = GetEsito(dr["Test_utilizzato"].ToString(), dr["RisDesc"].ToString(), dr["RISULTATO"].ToString());
+                                            switch (dr["Esito"].ToString())
+                                            {
+                                                case "NEGATIVO":
+                                                    dr["ESITO ESAME"] = "111";
+                                                    break;
+                                                case "POSITIVO":
+                                                    dr["ESITO ESAME"] = "112";
+                                                    break;
+                                                case "DEBOLMENTE POSITIVO":
+                                                case "DUBBIO":
+                                                    dr["ESITO ESAME"] = "113";
+                                                    break;
+                                            }
+                                            dr["TIPO TEST"] = tmpEsame == "COVID" ? "711" : "710";
+                                            dr["TEST MOLECOLARE DOPO ANTIGENICO"] = "";
+                                        }
+
+                                        dr["MOTIVO DELLA RICHIESTA"] = "914"; //Motivo non sanitario
+                                        dr["PAZIENTE FUORI REGIONE"] = "";
+
+
+                                        if (dr["ID_accettazione"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
+                                            dtCsv.Rows.Add(dr); //add other rows  
+                                        else
+                                        {
+                                            kEsclusi += 1;
+                                            lblStato.Text = "Pazienti esclusi : " + kEsclusi.ToString();
+                                            lblStato.Refresh();
+                                        }
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -1120,7 +1243,15 @@ namespace waCOVID
                 switch (tmpATS.Trim().ToUpper())
                 {
                     case "LOMBARDIA 321 - ATS  CITTÀ METROPOLITANA DI MILANO":
+                    case "LOMBARDIA 309 - A.S.L. DELLA PROVINCIA DI MILANO 1":
+                    case "LOMBARDIA 308 - A.S.L. DI MILANO":
                         tmpATS = "ALTRO ATS DELLA CITTA' METROPOLITANA DI MILANO";
+                        break;
+                    case "LOMBARDIA 322 - ATS DELL'INSUBRIA":
+                    case "LOMBARDIA 314 - ATS DELL'INSUBRIA":
+                    case "LOMBARDIA 303 - A.S.L.DELLA PROVINCIA DI COMO":
+                    case "LOMBARDIA 303 - A.S.L. DELLA PROVINCIA DI COMO":
+                        tmpATS = "ALTRO ATS DELL'INSUBRIA";
                         break;
                     case "LOMBARDIA 323 - ATS DELLA MONTAGNA":
                         tmpATS = "ALTRO ATS DELLA MONTAGNA";
@@ -1131,10 +1262,12 @@ namespace waCOVID
                     case "LOMBARDIA 325 - ATS DI BERGAMO":
                         tmpATS = "ALTRO ATS DI BERGAMO";
                         break;
-                    case "LOMBARDIA 326 - A.T.S.BRESCIA":
+                    case "LOMBARDIA 326 - A.T.S. BRESCIA":
+                    case "LOMBARDIA 302 - A.S.L. DELLA PROVINCIA DI BRESCIA":
                         tmpATS = "ALTRO ATS DI BRESCIA";
                         break;
                     case "LOMBARDIA 327 - ATS DELLA VAL PADANA":
+                    case "LOMBARDIA 307 - A.S.L. DELLA PROVINCIA DI MANTOVA":
                         tmpATS = "ALTRO ATS DELLA VAL PADANA";
                         break;
                     case "LOMBARDIA 328 - ATS DI PAVIA":
@@ -1154,7 +1287,7 @@ namespace waCOVID
                 "602", "603", "604", "605", "606", "607", "608", "609", "610", "611", "612", "613",
                 "614", "615", "616", "617", "618", "619", "620", "621", "622", "623", "624",
                 "670", "672", "673", "674", "675", "680", "681", "685", "686", "IV3", "CES", "CRG",
-                "MCE", "MPS", "MYM", "PSG", "SCE", "SGR"};
+                "MCE", "MPS", "MYM", "PSG", "SCE", "SGR", "MED", "DEL", "690"};
 
                 var lstBCP_ER = new List<string>
                 {
@@ -1278,6 +1411,7 @@ namespace waCOVID
                                     break;
                                 case "TARS":
                                 case "DEBOP":
+                                case "DUB":
                                 case "DEBOLMENTE POSITIVO":
                                     tmpRis = "DEBOLMENTE POSITIVO";
                                     break;
@@ -1799,7 +1933,24 @@ namespace waCOVID
                     if (chkFileEsteso.Checked == false)
                     {
                         dv = dtDataTable.DefaultView;
-                        dv.RowFilter = "DESC_RISULTATO<>'ANNULLATO' AND COGNOME<>'PROVA'";
+                        dv.RowFilter = "Test_utilizzato NOT LIKE 'COVRAG %' AND DESC_RISULTATO<>'ANNULLATO' AND COGNOME<>'PROVA'";
+                        dv.Sort = "ID_RICHIESTA_PK ASC";
+                        //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
+
+                        dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "AZIENDA_INVIANTE", "DESC_AZIENDA_INVIANTE", "TIPOLOGIA_PAZIENTE", "COGNOME", "NOME", "SESSO", "DATA_NASCITA", "DATA_DECESSO", "COD_ISTAT_NASCITA", "COMUNE_NASCITA", "TIPO_IDENTIFICATIVO",
+                            "CODICE_FISCALE", "COD_ISTAT_RESIDENZA", "COMUNE_RESIDENZA", "REGIONE_RESIDENZA", "VIA_RESIDENZA", "CIVICO_RESIDENZA", "CAP_RESIDENZA", "DESC_REGIONE_RESIDENZA", "COD_ISTAT_DOMICILIO",
+                            "COMUNE_DOMICILIO", "VIA_DOMICILIO", "CIVICO_DOMICILIO", "CAP_DOMICILIO", "ID_RICHIESTA_PK", "DATA_PRELIEVO", "DATA_ACCETTAZIONE", "DESC_PROVENIENZA_CAMPIONE", "ID_CAMPIONE", "ID_MATERIALE",
+                            "DESC_MATERIALE", "CODICE_ANALISI", "DESC_ANALISI", "CODICE_CUR", "PROG_ESITO", "ESITO", "DESC_ESITO", "METODICA", "LOINC", "RISULTATO_NUMERO", "DESC_RISULTATO", "DATA_ESECUZIONE", "DATA_REFERTAZIONE", "DATA_ULT_MOD");
+
+                        //Assegna i PROG_ESITO in base al campo ID_RICHIESTA_PK
+                        //dtDataTable = CalcolaProgressiviEsamiLiguria(dtDataTable);
+                    }
+                    break;
+                case enumTipoTracciato.LIGURIA_TAR:
+                    if (chkFileEsteso.Checked == false)
+                    {
+                        dv = dtDataTable.DefaultView;
+                        dv.RowFilter = "Test_utilizzato LIKE 'COVRAG %' AND DESC_RISULTATO<>'ANNULLATO' AND COGNOME<>'PROVA'";
                         dv.Sort = "ID_RICHIESTA_PK ASC";
                         //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
@@ -1832,6 +1983,42 @@ namespace waCOVID
                         dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "CF", "Telefono", "Azienda", "Presidio", "Esposizione Operatore", "Test rapido associato", "Area di competenza", "Sintomatologia", "Data inizio sintomi",
                             "Posizione paziente", "Ospedale", "Soggetto in gravidanza", "Data presumibile parto", "Data prelievo", "Laboratorio di destinazione", "Tipologia Tampone", "Medico che verifica il Tampone", "Risultato",
                             "Prestazione eseguita", "Data prestazione", "Ora prestazione", "Codice NSIS", "ID Operatore che esegue il Tampone");
+                    }
+                    break;
+                case enumTipoTracciato.PUGLIA:
+                case enumTipoTracciato.PUGLIA_V1:
+                case enumTipoTracciato.PUGLIA_V2:
+                case enumTipoTracciato.PUGLIA_DENUNCE_COVID:
+                case enumTipoTracciato.PUGLIA_DENUNCE_ANTIGENICI:
+                    if (chkFileEsteso.Checked == false)
+                    {
+                        dv = dtDataTable.DefaultView;
+                        switch (prmTipo)
+                        {
+                            case enumTipoTracciato.PUGLIA_V1:
+                                dv.RowFilter = " ESITO<>'ANNULLATO' AND TRIM([NUMERO RICHIESTA])='' AND COGNOME<>'PROVA'";
+                                dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "PUNTO DI ACCESSO", "RESIDENZA", "CODICE TIPO ESAME", "CODICE LABORATORIO", "PROGRESSIVO ESAME", "DATA PRELIEVO", "PAZIENTE AL PRELIEVO", "CODICE FISCALE O STP O ENI PAZIENTE",
+                                    "COGNOME PAZIENTE", "NOME PAZIENTE", "DATA NASCITA PAZIENTE", "STRUTTURA RICHIEDENTE", "ESITO ESAME", "DATA ESITO ESAME", "TIPO TEST", "TEST MOLECOLARE DOPO ANTIGENICO",
+                                    "MOTIVO DELLA RICHIESTA", "PAZIENTE FUORI REGIONE", "TELEFONO FISSO PAZIENTE", "TELEFONO MOBILE PAZIENTE", "RECAPITO E-MAIL PAZIENTE");
+                                break;
+                            case enumTipoTracciato.PUGLIA_V2:
+                                dv.RowFilter = "Test_utilizzato LIKE 'COVID %' AND TRIM([NUMERO RICHIESTA])<>'' AND ESITO<>'ANNULLATO' AND COGNOME<>'PROVA'";
+                                dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "NUMERO RICHIESTA", "CODICE TIPO ESAME", "CODICE LABORATORIO", "PROGRESSIVO ESAME", "DATA PRELIEVO", "PAZIENTE AL PRELIEVO",
+                                    "CODICE FISCALE O STP O ENI PAZIENTE", "COGNOME PAZIENTE", "NOME PAZIENTE", "DATA NASCITA PAZIENTE", "ESITO ESAME", "DATA ESITO ESAME");
+                                break;
+                            case enumTipoTracciato.PUGLIA_DENUNCE_COVID:
+                                //Tracciato Denunce ai dipartimenti
+                                dv.RowFilter = "Test_utilizzato LIKE 'COVID %' AND ESITO<>'ANNULLATO' AND COGNOME<>'PROVA'";
+                                dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "PUNTO DI ACCESSO", "RESIDENZA", "NOME", "COGNOME", "DATA DI NASCITA", "CODICE FISCALE", "ALL'ATTO DEL PRELIEVO", "CITTA'", "INDIRIZZO", "TELEFONO", "TELEFONO FISSO", "PROVENIENZA", "E-MAIL");
+                                break;
+                            case enumTipoTracciato.PUGLIA_DENUNCE_ANTIGENICI:
+                                //Tracciato Denunce ai dipartimenti
+                                dv.RowFilter = "Test_utilizzato LIKE 'COVRAG %' AND ESITO<>'ANNULLATO' AND COGNOME<>'PROVA'";
+                                dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "PUNTO DI ACCESSO", "RESIDENZA", "NOME", "COGNOME", "DATA DI NASCITA", "CODICE FISCALE", "ALL'ATTO DEL PRELIEVO", "CITTA'", "INDIRIZZO", "TELEFONO", "TELEFONO FISSO", "PROVENIENZA", "E-MAIL");
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 default:
@@ -1909,6 +2096,8 @@ namespace waCOVID
                 tmpTipo = enumTipoTracciato.SARDEGNA;
             else if (optCampania.Checked)
                 tmpTipo = enumTipoTracciato.CAMPANIA;
+            else if (optPuglia.Checked)
+                tmpTipo = enumTipoTracciato.PUGLIA;
             else
                 tmpTipo = enumTipoTracciato.ATS;
 
@@ -1965,8 +2154,12 @@ namespace waCOVID
                             + ".CSV");
                         break;
                     case enumTipoTracciato.LIGURIA:
+                        //Scrive 2 File uno per sierologici e tamponi e l'altro per gli antigenici
                         WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
                             + (chkFileEsteso.Checked ? "\\JLab Liguria Covid " : "\\COVLP888220")
+                            + ".CSV");
+                        WriteDtToCSV(enumTipoTracciato.LIGURIA_TAR, dt, Path.GetDirectoryName(Application.ExecutablePath)
+                            + (chkFileEsteso.Checked ? "\\JLab Liguria Covid TAR " : "\\TAR888220")
                             + ".CSV");
                         break;
                     case enumTipoTracciato.SARDEGNA:
@@ -1980,6 +2173,26 @@ namespace waCOVID
                             + (chkFileEsteso.Checked ? "\\JLab " : "\\Soresa ")
                             + (optTamponi.Checked ? "Tamponi IDR" : "Sierologici-TR IDR")
                             + ".CSV");
+                        break;
+                    case enumTipoTracciato.PUGLIA:
+                        /*
+                         File unico V1 Antigenici+COVID
+                         File unico V2 solo molecolari
+                         2 File Denunce uno per COVID e un per Antigenici
+                         */
+                        sFileName = Path.GetDirectoryName(Application.ExecutablePath) + (chkFileEsteso.Checked ? "\\JLab " : "\\GIAVA ");
+                        sFileName += DateTime.Now.ToString("dd-MM-yyyy");
+                        if (lblFileOrigine.Text.IndexOf("COVDE") > -1 || lblFileOrigine.Text.IndexOf("ANTDE") > -1)
+                        {
+                            WriteDtToCSV(enumTipoTracciato.PUGLIA_DENUNCE_ANTIGENICI, dt, sFileName + " ANTIGENICI DENUNCE.csv");
+                            WriteDtToCSV(enumTipoTracciato.PUGLIA_DENUNCE_COVID, dt, sFileName + " COVID DENUNCE.csv");
+                        }
+                        //sFileName += (optTamponi.Checked ? "Tamponi " : "Antigenici ");
+                        if (lblFileOrigine.Text.IndexOf("COGIA") > -1 || lblFileOrigine.Text.IndexOf("ANGIA") > -1)
+                        {
+                            WriteDtToCSV(enumTipoTracciato.PUGLIA_V1, dt, sFileName + " V1.csv");
+                            WriteDtToCSV(enumTipoTracciato.PUGLIA_V2, dt, sFileName + " V2.csv");
+                        }
                         break;
                     default:
                         break;
@@ -2072,26 +2285,36 @@ namespace waCOVID
         {
             openFileDialog1.ShowDialog();
             lblFileOrigine.Text = openFileDialog1.FileName;
-            if (lblFileOrigine.Text.IndexOf("COPIA") > 0)
+            if (lblFileOrigine.Text.IndexOf("COPIA") > -1)
                 optPiacenza.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COVEM") > 0)
+            else if (lblFileOrigine.Text.IndexOf("COVEM") > -1)
                 optEmiliaRomagna.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COPAR") > 0)
+            else if (lblFileOrigine.Text.IndexOf("COPAR") > -1)
                 optParma.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COMOD") > 0)
+            else if (lblFileOrigine.Text.IndexOf("COMOD") > -1)
                 optModena.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COSAR") > 0)
+            else if (lblFileOrigine.Text.IndexOf("COSAR") > -1)
                 optSardegna.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COASL") > 0 || lblFileOrigine.Text.IndexOf("COALE") > 0)
+            else if (lblFileOrigine.Text.IndexOf("COASL") > -1 || lblFileOrigine.Text.IndexOf("COALE") > -1)
                 optPiemonte.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("ALISA") > 0)
+            else if (lblFileOrigine.Text.IndexOf("ALISA") > -1)
                 optLiguria.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("CAM") > 0)
+            else if (lblFileOrigine.Text.IndexOf("ANGIA") > -1 || lblFileOrigine.Text.IndexOf("ANTDE") > -1)
+            {
+                optAntigenici.Checked = true;
+                optPuglia.Checked = true;
+            }
+            else if (lblFileOrigine.Text.IndexOf("COGIA") > -1 || lblFileOrigine.Text.IndexOf("COVDE") > -1)
+            {
+                optTamponi.Checked = true;
+                optPuglia.Checked = true;
+            }
+            else if (lblFileOrigine.Text.IndexOf("CAM") > -1)
             {
                 optCampania.Checked = true;
-                if (lblFileOrigine.Text.IndexOf("CAMTP") > 0)
+                if (lblFileOrigine.Text.IndexOf("CAMTP") > -1)
                     optTamponi.Checked = true;
-                else if (lblFileOrigine.Text.IndexOf("CAMSI") > 0)
+                else if (lblFileOrigine.Text.IndexOf("CAMSI") > -1)
                     optSierologici.Checked = true;
                 else
                     optTestRapidi.Checked = true;
@@ -2100,9 +2323,9 @@ namespace waCOVID
             {
                 if (optPiacenza.Checked == true)
                     optTradate.Checked = true;
-                if (lblFileOrigine.Text.IndexOf("COATS") > 0)
+                if (lblFileOrigine.Text.IndexOf("COATS") > -1)
                     optSierologici.Checked = true;
-                else if (lblFileOrigine.Text.IndexOf("COTAM") > 0)
+                else if (lblFileOrigine.Text.IndexOf("COTAM") > -1)
                     optTamponi.Checked = true;
             }
         }
@@ -2112,7 +2335,7 @@ namespace waCOVID
         }
         private void optSede_CheckedChanged(object sender, EventArgs e)
         {
-            pnlTipoFile.Visible = optTradate.Checked || optViadana.Checked || optCampania.Checked;
+            pnlTipoFile.Visible = optTradate.Checked || optViadana.Checked || optCampania.Checked || optPuglia.Checked;
             pnlCFRefertante.Visible = optPiemonte.Checked;
         }
         private void frmStatCOVID_Load(object sender, EventArgs e)
@@ -2150,10 +2373,11 @@ namespace waCOVID
                         while (null != (tempLineValue = inputReader.ReadLine()))
                         {
                             var aStringBuilder = new StringBuilder(tempLineValue);
-                            if (lblFileOrigine.Text.IndexOf("SPS") > 0)
+                            if (lblFileOrigine.Text.IndexOf("SPS") > -1)
                             {
                                 NRec += 1;
-                                //aStringBuilder.Remove(28, 20);
+                                aStringBuilder.Remove(28, 20);
+                                aStringBuilder.Insert(28, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(28, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(28, "20200050641001" + Prog.ToString("000000")); //Fleming
                                 //aStringBuilder.Insert(28, "56308920201001" + Prog.ToString("000000")); //Selab
@@ -2187,9 +2411,10 @@ namespace waCOVID
 
                                 }
                             }
-                            else if (lblFileOrigine.Text.IndexOf("SPA") > 0)
+                            else if (lblFileOrigine.Text.IndexOf("SPA") > -1)
                             {
-                                //aStringBuilder.Remove(25, 20);
+                                aStringBuilder.Remove(25, 20);
+                                aStringBuilder.Insert(25, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(25, "20200050641001" + Prog.ToString("000000")); //Fleming
                                 //aStringBuilder.Insert(25, "56308920200801" + Prog.ToString("000000")); //Selab
