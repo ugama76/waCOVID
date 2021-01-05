@@ -73,6 +73,7 @@
             this.optSardegna = new System.Windows.Forms.RadioButton();
             this.optCampania = new System.Windows.Forms.RadioButton();
             this.optPuglia = new System.Windows.Forms.RadioButton();
+            this.optVeneto = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.pnlTipoFile.SuspendLayout();
             this.pnlCFRefertante.SuspendLayout();
@@ -384,7 +385,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1062, 96);
             this.panel2.TabIndex = 21;
-            this.panel2.Visible = false;
             // 
             // label7
             // 
@@ -531,18 +531,30 @@
             // 
             this.optPuglia.AutoSize = true;
             this.optPuglia.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.optPuglia.Location = new System.Drawing.Point(751, 161);
+            this.optPuglia.Location = new System.Drawing.Point(751, 156);
             this.optPuglia.Name = "optPuglia";
             this.optPuglia.Size = new System.Drawing.Size(80, 20);
             this.optPuglia.TabIndex = 24;
             this.optPuglia.Text = "PUGLIA";
             this.optPuglia.UseVisualStyleBackColor = true;
             // 
+            // optVeneto
+            // 
+            this.optVeneto.AutoSize = true;
+            this.optVeneto.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optVeneto.Location = new System.Drawing.Point(871, 156);
+            this.optVeneto.Name = "optVeneto";
+            this.optVeneto.Size = new System.Drawing.Size(88, 20);
+            this.optVeneto.TabIndex = 25;
+            this.optVeneto.Text = "VENETO";
+            this.optVeneto.UseVisualStyleBackColor = true;
+            // 
             // frmStatCOVID
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1086, 369);
+            this.Controls.Add(this.optVeneto);
             this.Controls.Add(this.optPuglia);
             this.Controls.Add(this.optCampania);
             this.Controls.Add(this.optSardegna);
@@ -627,6 +639,7 @@
         private System.Windows.Forms.ComboBox cmbCFRefertante;
         private System.Windows.Forms.RadioButton optAntigenici;
         private System.Windows.Forms.RadioButton optPuglia;
+        private System.Windows.Forms.RadioButton optVeneto;
     }
 }
 

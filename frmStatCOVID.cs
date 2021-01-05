@@ -37,6 +37,7 @@ namespace waCOVID
             PUGLIA_V2,
             PUGLIA_DENUNCE_COVID,
             PUGLIA_DENUNCE_ANTIGENICI,
+            VENETO
         }
         private enum enumTipoEsame
         {
@@ -535,7 +536,8 @@ namespace waCOVID
                                             {
                                                 dr["esitoDesc"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
                                                 if (dr["esitoDesc"].ToString() == "DEBOLMENTE POSITIVO")
-                                                    dr["esitoDesc"] = "DUBBIO";
+                                                    //dr["esitoDesc"] = "DUBBIO"; Mail di Cardarelli e Alessandro Rosa del 17/12/2020
+                                                    dr["esitoDesc"] = "POSITIVO";
                                             }
                                             else
                                             {
@@ -1101,7 +1103,8 @@ namespace waCOVID
                                         dr["PROGRESSIVO ESAME"] = "";
                                         dr["PAZIENTE AL PRELIEVO"] = dr["PAZIENTE AL PRELIEVO"].ToString().Replace("<p>", "").Replace("</p>", "").Trim();
                                         dr["STRUTTURA RICHIEDENTE"] = "Lifebrain Lecce Srl";
-
+                                        if (dr["PUNTO DI ACCESSO"].ToString().IndexOf("MDL") > -1 || dr["PUNTO DI ACCESSO"].ToString().IndexOf("SERVICE") > -1)
+                                            dr["STRUTTURA RICHIEDENTE"] = dr["REPARTO"].ToString();
                                         //Riassegna le colonne per le denunce
                                         dr["NOME"] = dr["NOME PAZIENTE"];
                                         dr["COGNOME"] = dr["COGNOME PAZIENTE"];
@@ -1112,6 +1115,9 @@ namespace waCOVID
                                         dr["TELEFONO"] = dr["TELEFONO MOBILE PAZIENTE"];
                                         dr["TELEFONO FISSO"] = dr["TELEFONO FISSO PAZIENTE"];
                                         dr["PROVENIENZA"] = "LABORATORIO ANALISI PIGNATELLI SRL";
+                                        if (dr["PUNTO DI ACCESSO"].ToString().IndexOf("MDL") > -1 || dr["PUNTO DI ACCESSO"].ToString().IndexOf("SERVICE") > -1)
+                                            dr["PROVENIENZA"] = dr["REPARTO"].ToString();
+
                                         dr["E-MAIL"] = dr["RECAPITO E-MAIL PAZIENTE"];
 
                                         if (dr["PAZIENTE AL PRELIEVO"].ToString().IndexOf("SINTOMATICO") == 0 || dr["PAZIENTE AL PRELIEVO"].ToString().IndexOf("PAUCISINTOMATICO") > -1)
@@ -1145,6 +1151,62 @@ namespace waCOVID
 
 
                                         if (dr["ID_accettazione"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
+                                            dtCsv.Rows.Add(dr); //add other rows  
+                                        else
+                                        {
+                                            kEsclusi += 1;
+                                            lblStato.Text = "Pazienti esclusi : " + kEsclusi.ToString();
+                                            lblStato.Refresh();
+                                        }
+                                    }
+                                    break;
+                                case enumTipoTracciato.VENETO:
+                                    if (i == 0)
+                                    {
+                                        for (int j = 0; j < rowValues.Count(); j++)
+                                        {
+                                            dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
+                                        }
+                                        //if (lblFileOrigine.Text.IndexOf("COVDE") > -1 || lblFileOrigine.Text.IndexOf("ANTDE") > -1)
+                                        //    dtCsv.Columns.Add("NUMERO RICHIESTA"); //add other columns
+                                        dtCsv.Columns.Add("AZIENDA"); //add other columns
+                                        dtCsv.Columns.Add("METODICA"); //add other columns
+                                        dtCsv.Columns.Add("MOTIVO_INDAGINE"); //add other columns
+                                        dtCsv.Columns.Add("MARCA_MODELLO"); //add other columns
+                                        dtCsv.Columns.Add("ESITO");
+                                        dtCsv.Columns.Add("BCP");
+                                    }
+                                    else
+                                    {
+                                        DataRow dr = dtCsv.NewRow();
+                                        for (int k = 0; k < rowValues.Count(); k++)
+                                        {
+                                            dr[k] = rowValues[k].ToString().Trim();
+                                        }
+                                        dr["AZIENDA"] = "050_lifebrain";
+                                        dr["METODICA"] = "ANTIGENICO";
+                                        dr["MOTIVO_INDAGINE"] = "Screening";
+                                        dr["MARCA_MODELLO"] = "";
+                                        dr["ULSS_RESIDENZA"] = "";
+                                        string sOra = dr["OraAcc"].ToString().Replace(".", ":");
+                                        dr["DATA_PRELIEVO"] = dr["DATA_PRELIEVO"] + " " + sOra + ":00";
+                                        sOra = dr["Ora_Referto"].ToString().Replace(".", ":");
+                                        dr["DATA_REFERTO"] = dr["DATA_REFERTO"] + " " + sOra + ":00";
+
+                                        //if (dr["PUNTO DI ACCESSO"].ToString().IndexOf("MDL") > -1 || dr["PUNTO DI ACCESSO"].ToString().IndexOf("SERVICE") > -1)
+                                        //    dr["STRUTTURA RICHIEDENTE"] = dr["REPARTO"].ToString();
+                                        //Riassegna le colonne per le denunce
+                                        dr["BCP"] = GetLabRif(dr["Punto Accesso"].ToString()); //add other columns
+
+                                        tmpEsame = dr["Test_utilizzato"].ToString().Substring(0, dr["Test_utilizzato"].ToString().IndexOf(" "));
+                                        if (tmpEsame == "COVRAG") //TAMPONI
+                                        {
+                                            dr["Esito"] = GetEsito(dr["Test_utilizzato"].ToString(), dr["RisDesc"].ToString(), dr["CodRi"].ToString());
+                                            if (dr["Esito"].ToString() == "ANNULLATO")
+                                                dr["Esito"] = "INDETERMINATO";
+                                        }
+
+                                        if (dr["ID_TEST_ANTIGENICO"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
                                             dtCsv.Rows.Add(dr); //add other rows  
                                         else
                                         {
@@ -1287,7 +1349,7 @@ namespace waCOVID
                 "602", "603", "604", "605", "606", "607", "608", "609", "610", "611", "612", "613",
                 "614", "615", "616", "617", "618", "619", "620", "621", "622", "623", "624",
                 "670", "672", "673", "674", "675", "680", "681", "685", "686", "IV3", "CES", "CRG",
-                "MCE", "MPS", "MYM", "PSG", "SCE", "SGR", "MED", "DEL", "690"};
+                "MCE", "MPS", "MYM", "PSG", "SCE", "SGR", "MED", "DEL", "690", "696"};
 
                 var lstBCP_ER = new List<string>
                 {
@@ -1295,11 +1357,12 @@ namespace waCOVID
                 "567", "568", "569", "570", "571", "572", "573", "574", "575", "576", "579", "580", "581",
                 "AC1", "AC2", "AC3", "AC4", "AC5", "ES1", "ES2", "ES3", "ES4", "ES5", "ME1", "ME2", "ME3",
                 "ME4", "ME5", "ME6", "MN1", "MN2", "MN3", "MN4", "MN5", "MR1", "MR2", "MR3", "MR4", "MR5",
-                "RV1", "RV2", "RV3", "RV4", "RV5", "SM1", "SM2", "SM3", "SM4", "SM5"
+                "RV1", "RV2", "RV3", "RV4", "RV5", "SM1", "SM2", "SM3", "SM4", "SM5", "CA1", "CA2", "CA3",
+                "CAR", "IV2", "IV3", "NV", "TE1", "TE2", "TE3", "TEC"
                 };
                 bool contains;
                 string tmpBCP = prmBCP.Substring(0, prmBCP.IndexOf(" ")).Trim();
-                if (optEmiliaRomagna.Checked)
+                if (optEmiliaRomagna.Checked || optVeneto.Checked)
                 {
                     contains = lstBCP_ER.Contains(tmpBCP, StringComparer.OrdinalIgnoreCase);
                     if (contains)
@@ -1411,9 +1474,12 @@ namespace waCOVID
                                     break;
                                 case "TARS":
                                 case "DEBOP":
-                                case "DUB":
                                 case "DEBOLMENTE POSITIVO":
                                     tmpRis = "DEBOLMENTE POSITIVO";
+                                    break;
+                                case "DUB":
+                                case "00074":
+                                    tmpRis = "DUBBIO";
                                     break;
                                 case "ANNULLATO":
                                 case "ANN":
@@ -1464,9 +1530,15 @@ namespace waCOVID
                             case ".":
                             case "..":
                             case "ANN":
+                            case "CNI":
                             case "CNV":
                             case "MC":
-                                tmpRis = "ANNULLATO";
+                                if (prmRisultato.ToUpper() == "NEGATIVO")
+                                    tmpRis = "NEGATIVO";
+                                else if (prmRisultato.ToUpper() == "POSITIVO")
+                                    tmpRis = "POSITIVO";
+                                else
+                                    tmpRis = "ANNULLATO";
                                 break;
                         }
                         break;
@@ -2021,6 +2093,17 @@ namespace waCOVID
                         }
                     }
                     break;
+                case enumTipoTracciato.VENETO:
+                    //
+                    if (chkFileEsteso.Checked == false)
+                    {
+                        dv = dtDataTable.DefaultView;
+                        dv.RowFilter = "BCP<>'EMILIA ROMAGNA' AND Esito<>'ANNULLATO' AND Cognome<>'PROVA'";
+
+                        dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "ID_TEST_ANTIGENICO", "AZIENDA", "RICHIEDENTE", "COGNOME", "NOME", "DATA_NASCITA", "ULSS_RESIDENZA", "ESITO", "SESSO", "CODICE_FISCALE",
+                            "DATA_PRELIEVO", "DATA_REFERTO", "METODICA", "MOTIVO_INDAGINE", "MARCA_MODELLO");
+                    }
+                    break;
                 default:
                     break;
             }
@@ -2040,13 +2123,17 @@ namespace waCOVID
             }
             if (optLiguria.Checked == true && chkFileEsteso.Checked == false)
                 bIntesta = false;
+            if (optVeneto.Checked)
+            {
+                tmpSep = "|";
+            }
             if (bIntesta)
             {
                 for (int i = 0; i < dtDataTable.Columns.Count; i++)
                 {
                     sw.Write(dtDataTable.Columns[i]);
                     if (i < dtDataTable.Columns.Count - 1)
-                        sw.Write(";");
+                        sw.Write(tmpSep);
                 }
                 sw.Write(sw.NewLine);
             }
@@ -2098,6 +2185,8 @@ namespace waCOVID
                 tmpTipo = enumTipoTracciato.CAMPANIA;
             else if (optPuglia.Checked)
                 tmpTipo = enumTipoTracciato.PUGLIA;
+            else if (optVeneto.Checked)
+                tmpTipo = enumTipoTracciato.VENETO;
             else
                 tmpTipo = enumTipoTracciato.ATS;
 
@@ -2193,6 +2282,12 @@ namespace waCOVID
                             WriteDtToCSV(enumTipoTracciato.PUGLIA_V1, dt, sFileName + " V1.csv");
                             WriteDtToCSV(enumTipoTracciato.PUGLIA_V2, dt, sFileName + " V2.csv");
                         }
+                        break;
+                    case enumTipoTracciato.VENETO:
+                        WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
+                            + (chkFileEsteso.Checked ? "\\JLab " : "\\")
+                            + (optAntigenici.Checked ? DateTime.Now.ToString("yyyyMMdd_HHmm") + "_TEST_ANTIGENICO_050_lifebrain" : "Covid RDI")
+                            + ".CSV");
                         break;
                     default:
                         break;
@@ -2319,6 +2414,11 @@ namespace waCOVID
                 else
                     optTestRapidi.Checked = true;
             }
+            else if (lblFileOrigine.Text.IndexOf("ASL4") > -1)
+            {
+                optVeneto.Checked = true;
+                optAntigenici.Checked = true;
+            }
             else
             {
                 if (optPiacenza.Checked == true)
@@ -2376,8 +2476,8 @@ namespace waCOVID
                             if (lblFileOrigine.Text.IndexOf("SPS") > -1)
                             {
                                 NRec += 1;
-                                aStringBuilder.Remove(28, 20);
-                                aStringBuilder.Insert(28, "61115220201001" + Prog.ToString("000000")); //Biotest
+                                //aStringBuilder.Remove(28, 20);
+                                //aStringBuilder.Insert(28, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(28, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(28, "20200050641001" + Prog.ToString("000000")); //Fleming
                                 //aStringBuilder.Insert(28, "56308920201001" + Prog.ToString("000000")); //Selab
@@ -2413,8 +2513,8 @@ namespace waCOVID
                             }
                             else if (lblFileOrigine.Text.IndexOf("SPA") > -1)
                             {
-                                aStringBuilder.Remove(25, 20);
-                                aStringBuilder.Insert(25, "61115220201001" + Prog.ToString("000000")); //Biotest
+                                //aStringBuilder.Remove(25, 20);
+                                //aStringBuilder.Insert(25, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(25, "20200050641001" + Prog.ToString("000000")); //Fleming
                                 //aStringBuilder.Insert(25, "56308920200801" + Prog.ToString("000000")); //Selab
