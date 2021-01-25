@@ -630,8 +630,6 @@ namespace waCOVID
                                             }
                                         }
 
-
-
                                         dr["code"] = GetCUR(prmTipo, tmpEsame);
                                         switch (dr["code"].ToString())
                                         {
@@ -643,12 +641,23 @@ namespace waCOVID
                                                 break;
                                             case "91.31.c":
                                                 dr["displayName"] = "test sierologico igg";
+                                                dr["Unit"] = GetRangeUM(tmpEsame, false);
+                                                dr["Value"] = dr["Risultato"];
+                                                dr["ReferenceRange"] = GetRangeUM(tmpEsame, true);
                                                 break;
                                             case "91.31.d":
                                                 dr["displayName"] = "test sierologico igm";
+                                                dr["Unit"] = GetRangeUM(tmpEsame, false);
+                                                dr["Value"] = dr["Risultato"];
+                                                dr["ReferenceRange"] = GetRangeUM(tmpEsame, true);
                                                 break;
                                         }
                                         //dr["displayName"] = (tmpEsame.Substring(tmpEsame.IndexOf(" "), tmpEsame.Length - tmpEsame.IndexOf(" "))).Trim();
+                                        //if (DateTime.TryParse(dr["dataPrelievo"].ToString(), out dNas))
+                                        //{
+                                        //    dr["dataPrelievo"] = dNas.ToString("yyyyMMddHHmmss+0000");
+                                        //}
+
                                         if (DateTime.TryParse(dr["Data Refertazione"].ToString(), out dNas))
                                         {
                                             string sOraEsame = dr["OraEsame"].ToString().Replace(".", ":");
@@ -661,6 +670,7 @@ namespace waCOVID
                                         }
                                         if (chkCFRefertante.Checked)
                                             dr["legalauthenticator"] = cmbCFRefertante.Text;
+
                                         if (dr["id_documento"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
                                             dtCsv.Rows.Add(dr); //add other rows  
                                     }
@@ -832,13 +842,16 @@ namespace waCOVID
                                         dtCsv.Columns.Add("regione"); //add other columns
                                         dtCsv.Columns.Add("azienda"); //add other columns
                                         dtCsv.Columns.Add("laboratorio"); //add other columns
-                                        dtCsv.Columns.Add("provenienza"); //add other columns
-                                        dtCsv.Columns.Add("tipo_provenienza"); //add other columns
-                                        dtCsv.Columns.Add("reparto"); //add other columns
-                                        dtCsv.Columns.Add("determinazione"); //add other columns
-                                        dtCsv.Columns.Add("comune"); //add other columns
-                                        dtCsv.Columns.Add("categoria"); //add other columns
-                                        dtCsv.Columns.Add("qualifica"); //add other columns
+                                        dtCsv.Columns.Add("Provenienza"); //add other columns
+                                        dtCsv.Columns.Add("Tipo Provenienza"); //add other columns
+                                        dtCsv.Columns.Add("Reparto"); //add other columns
+                                        dtCsv.Columns.Add("Determinazione"); //add other columns
+                                        dtCsv.Columns.Add("Data prelievo"); //add other columns
+                                        dtCsv.Columns.Add("Data determinazione"); //add other columns
+                                        dtCsv.Columns.Add("Comune nascita"); //add other columns
+                                        dtCsv.Columns.Add("Recapito telefonico"); //add other columns
+                                        dtCsv.Columns.Add("Categoria"); //add other columns
+                                        dtCsv.Columns.Add("Qualifica"); //add other columns
                                         dtCsv.Columns.Add("ESITO"); //add other columns
                                         dtCsv.Columns.Add("esito_biomolecolare"); //add other columns
                                         dtCsv.Columns.Add("esito_immunologico"); //add other columns
@@ -855,117 +868,153 @@ namespace waCOVID
 
                                         dr["regione"] = "200";
                                         dr["azienda"] = "201";
-                                        //dr["laboratorio"] = "001737";
-                                        dr["laboratorio"] = "120140";
+                                        /*
+                                        LAB NUORO: 001601
+                                        LAO: 120140
+                                        TRC: 120130
+                                        LACS: 201301
+                                        LAB NORD: 027000
+                                        LAP: 028000
+                                        LAB VILLASIMIUS: 200454 
+                                         */
 
-                                        dr["provenienza"] = new string(' ', 8);
-                                        dr["tipo_provenienza"] = " ";
-                                        dr["reparto"] = new string(' ', 4);
+                                        //dr["laboratorio"] = "001737";
+                                        //dr["laboratorio"] = "120140";
+                                        dr["laboratorio"] = GetLabRif(dr["BCP"].ToString()).ToString().PadRight(6, ' ');
+
+                                        dr["Provenienza"] = new string(' ', 8);
+                                        //dr["tipo_provenienza"] = " ";
+                                        dr["Tipo Provenienza"] = "5"; //Privato oppure 9=Altro
+                                        dr["Reparto"] = new string(' ', 4);
 
                                         //Inserisce solo i tamponi
                                         //if (GetCUR(prmTipo, tmpEsame, false) == "1")
                                         //    dr["determinazione"] = "1";
                                         //else
                                         //    dr["determinazione"] = new string(' ', 1);
-                                        dr["determinazione"] = GetCUR(prmTipo, tmpEsame, false);
+                                        dr["Determinazione"] = GetCUR(prmTipo, tmpEsame, false);
 
                                         DateTime dNas;
                                         if (DateTime.TryParse(dr["DATA"].ToString(), out dNas))
-                                            dr["DATA"] = dNas.ToString("ddMMyyyy");
+                                            dr["Data prelievo"] = dNas.ToString("ddMMyyyy");
                                         else
-                                            dNas = DateTime.Now.Date;
+                                            new string(' ', 8);
 
                                         dr["id"] = (dNas.ToString("yyyyMMdd") + ("0000" + dr["Prog"].ToString()).Substring(("0000" + dr["Prog"].ToString()).Length - 4, 4)) + kRecord.ToString("0000");
 
-                                        dr["cognome"] = dr["cognome"].ToString().PadRight(30, ' ').Substring(0, 30);
-                                        dr["nome"] = dr["nome"].ToString().PadRight(20, ' ').Substring(0, 20);
-                                        dr["cf"] = dr["cf"].ToString().PadRight(16, ' ');
-                                        if (DateTime.TryParse(dr["data_nascita"].ToString(), out dNas))
-                                            dr["data_nascita"] = dNas.ToString("ddMMyyyy");
+                                        if (DateTime.TryParse(dr["Data Esame"].ToString(), out dNas))
+                                            dr["Data determinazione"] = dNas.ToString("ddMMyyyy");
                                         else
-                                            dr["data_nascita"] = Convert.ToDateTime(GetDataNascitaFromCF(dr["cf"].ToString())).ToString("ddMMyyyy");
-                                        dr["genere"] = " ";
-                                        dr["comune"] = new string(' ', 6);
-                                        dr["comune_descrizione"] = new string(' ', 27);
-                                        dr["categoria"] = " ";
-                                        dr["qualifica"] = " ";
+                                            new string(' ', 8);
 
-                                        if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVID" || tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG") //TAMPONI o Antigenici
+
+                                        dr["Cognome"] = dr["cognome"].ToString().PadRight(30, ' ').Substring(0, 30);
+                                        dr["Nome"] = dr["nome"].ToString().PadRight(20, ' ').Substring(0, 20);
+                                        dr["CF"] = dr["CF"].ToString().PadRight(16, ' ');
+                                        dr["Comune nascita"] = GetLuogoNascitaFromCF(dr["CF"].ToString(), dNas, conn).PadRight(6, ' ');
+                                        if (DateTime.TryParse(dr["Data nascita"].ToString(), out dNas))
+                                            dr["Data nascita"] = dNas.ToString("ddMMyyyy");
+                                        else if (dr["CF"].ToString().Trim() != "")
+                                            dr["Data nascita"] = Convert.ToDateTime(GetDataNascitaFromCF(dr["CF"].ToString())).ToString("ddMMyyyy");
+                                        dr["Genere"] = " ";
+                                        dr["Comune domicilio"] = dr["Comune domicilio"].ToString().PadRight(6, ' ');
+                                        dr["Comune domicilio descrizione"] = dr["Comune domicilio descrizione"].ToString().PadRight(27, ' ');
+                                        dr["E-Mail"] = dr["E-Mail"].ToString().PadRight(100, ' ');
+
+                                        if (dr["Cellulare"].ToString().Trim() != "")
+                                            dr["Recapito telefonico"] = dr["Cellulare"].ToString().Trim().PadRight(20, ' ');
+                                        else
                                         {
-                                            dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString());
-
-                                            switch (dr["Esito"].ToString())
-                                            {
-                                                case "POSITIVO":
-                                                    dr["esito_biomolecolare"] = "1";
-                                                    break;
-                                                case "NEGATIVO":
-                                                    dr["esito_biomolecolare"] = "2";
-                                                    break;
-                                                case "DEBOLMENTE POSITIVO":
-                                                    dr["esito_biomolecolare"] = "3";
-                                                    break;
-                                                case "ANNULATO":
-                                                    dr["esito_biomolecolare"] = "4";
-                                                    break;
-                                                default:
-                                                    dr["esito_biomolecolare"] = "9";
-                                                    break;
-                                            }
-                                            dr["esito_immunologico"] = " ";
-                                        }
-                                        else //SIEROLOGICI
-                                        {
-                                            dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString());
-                                            dr["esito_biomolecolare"] = " ";
-                                            Enum.TryParse(GetCUR(prmTipo, tmpEsame, true), out enumTipoEsame tmpTipoEsame);
-
-                                            if (dr["Esito"].ToString() == "ANNULLATO")
-                                                dr["esito_immunologico"] = "8";
-                                            else if (dr["Esito"].ToString() == "DUBBIO")
-                                                dr["esito_immunologico"] = "7";
+                                            if (dr["Abitazione"].ToString().Trim() != "")
+                                                dr["Recapito telefonico"] = dr["Abitazione"].ToString().PadRight(20, ' ');
+                                            else if (dr["Lavoro"].ToString().Trim() != "")
+                                                dr["Recapito telefonico"] = dr["Lavoro"].ToString().PadRight(20, ' ');
                                             else
+                                                dr["Recapito telefonico"] = new string(' ', 20);
+                                        }
+
+                                        dr["Categoria"] = "5"; //Esterno Solvente
+                                        dr["Qualifica"] = " ";
+
+                                        if (tmpEsame != "")
+                                        {
+                                            if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVID" || tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVRAG") //TAMPONI o Antigenici
                                             {
-                                                switch (tmpTipoEsame)
+                                                dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString());
+
+                                                switch (dr["Esito"].ToString())
                                                 {
-                                                    case enumTipoEsame.Tampone:
-                                                    case enumTipoEsame.TestRapido:
+                                                    case "POSITIVO":
+                                                        dr["esito_biomolecolare"] = "1";
                                                         break;
-                                                    case enumTipoEsame.IgTot:
-                                                        switch (dr["Esito"].ToString())
-                                                        {
-                                                            case "POSITIVO":
-                                                                dr["esito_immunologico"] = "T";
-                                                                break;
-                                                            case "NEGATIVO":
-                                                                dr["esito_immunologico"] = "0";
-                                                                break;
-                                                        }
+                                                    case "NEGATIVO":
+                                                        dr["esito_biomolecolare"] = "2";
                                                         break;
-                                                    case enumTipoEsame.IgG:
-                                                        switch (dr["Esito"].ToString())
-                                                        {
-                                                            case "POSITIVO":
-                                                                dr["esito_immunologico"] = "D";
-                                                                break;
-                                                            case "NEGATIVO":
-                                                                dr["esito_immunologico"] = "C";
-                                                                break;
-                                                        }
+                                                    case "DEBOLMENTE POSITIVO":
+                                                        dr["esito_biomolecolare"] = "3";
                                                         break;
-                                                    case enumTipoEsame.IgM:
-                                                        switch (dr["Esito"].ToString())
-                                                        {
-                                                            case "POSITIVO":
-                                                                dr["esito_immunologico"] = "F";
-                                                                break;
-                                                            case "NEGATIVO":
-                                                                dr["esito_immunologico"] = "E";
-                                                                break;
-                                                        }
+                                                    case "ANNULATO":
+                                                        dr["esito_biomolecolare"] = "4";
                                                         break;
-                                                    case enumTipoEsame.IgA:
+                                                    default:
+                                                        dr["esito_biomolecolare"] = "9";
                                                         break;
+                                                }
+                                                dr["esito_immunologico"] = " ";
+                                            }
+                                            else //SIEROLOGICI
+                                            {
+                                                dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString());
+                                                dr["esito_biomolecolare"] = " ";
+                                                Enum.TryParse(GetCUR(prmTipo, tmpEsame, true), out enumTipoEsame tmpTipoEsame);
+
+                                                if (dr["Esito"].ToString() == "ANNULLATO")
+                                                    dr["esito_immunologico"] = "8";
+                                                else if (dr["Esito"].ToString() == "DUBBIO")
+                                                    dr["esito_immunologico"] = "7";
+                                                else
+                                                {
+                                                    switch (tmpTipoEsame)
+                                                    {
+                                                        case enumTipoEsame.Tampone:
+                                                        case enumTipoEsame.TestRapido:
+                                                            break;
+                                                        case enumTipoEsame.IgTot:
+                                                            switch (dr["Esito"].ToString())
+                                                            {
+                                                                case "POSITIVO":
+                                                                    dr["esito_immunologico"] = "T";
+                                                                    break;
+                                                                case "NEGATIVO":
+                                                                    dr["esito_immunologico"] = "0";
+                                                                    break;
+                                                            }
+                                                            break;
+                                                        case enumTipoEsame.IgG:
+                                                            switch (dr["Esito"].ToString())
+                                                            {
+                                                                case "POSITIVO":
+                                                                    dr["esito_immunologico"] = "D";
+                                                                    break;
+                                                                case "NEGATIVO":
+                                                                    dr["esito_immunologico"] = "C";
+                                                                    break;
+                                                            }
+                                                            break;
+                                                        case enumTipoEsame.IgM:
+                                                            switch (dr["Esito"].ToString())
+                                                            {
+                                                                case "POSITIVO":
+                                                                    dr["esito_immunologico"] = "F";
+                                                                    break;
+                                                                case "NEGATIVO":
+                                                                    dr["esito_immunologico"] = "E";
+                                                                    break;
+                                                            }
+                                                            break;
+                                                        case enumTipoEsame.IgA:
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -1252,6 +1301,7 @@ namespace waCOVID
             COVIGS Altro (Stratego)
             COVIGS_2 Altro (Stratego)
             COVIGS_3 Altro (Stratego)
+            CORAGQ (Medical System)
              */
             switch (tmpEsame)
             {
@@ -1290,6 +1340,9 @@ namespace waCOVID
                 case "COVTGM":
                 case "COVR":
                     tmpStru = "Elecsys Anti-SARS-CoV-2 ROCHE";
+                    break;
+                case "CORAGQ":
+                    tmpStru = "Medical System";
                     break;
                 default:
                     tmpStru = "Altro";
@@ -1369,6 +1422,78 @@ namespace waCOVID
                         return "EMILIA ROMAGNA";
                     else
                         return "";
+                }
+                else if (optSardegna.Checked)
+                {
+                    string sLabRif = "";
+
+                    switch (tmpBCP)
+                    {
+                        case "900":
+                        case "901":
+                        case "902":
+                        case "903":
+                        case "904":
+                        case "IV1":
+                            sLabRif = "001601"; //LAB NUORO: 
+                            break;
+                        case "910":
+                        case "911":
+                        case "912":
+                        case "913":
+                        case "914":
+                        case "915":
+                        case "916":
+                        case "IV4":
+                            sLabRif = "120130"; //TRC: 
+                            break;
+                        case "920":
+                        case "921":
+                        case "922":
+                        case "923":
+                        case "924":
+                        case "IV2":
+                            sLabRif = "201301"; //LACS: 
+                            break;
+                        case "930":
+                        case "931":
+                        case "932":
+                        case "933":
+                        case "934":
+                        case "935":
+                        case "IV5":
+                            sLabRif = "120140"; //LAO: 
+                            break;
+                        case "940":
+                        case "941":
+                        case "942":
+                        case "943":
+                        case "944":
+                        case "945":
+                        case "IV6":
+                            sLabRif = "200454"; //LAB VILLASIMIUS:  
+                            break;
+                        case "950":
+                        case "951":
+                        case "952":
+                        case "953":
+                        case "954":
+                        case "955":
+                        case "IV7":
+                            sLabRif = "028000"; //LAP: 
+                            break;
+                        case "960":
+                        case "961":
+                        case "962":
+                        case "963":
+                        case "964":
+                        case "IV8":
+                            sLabRif = "027000"; //LAB NORD: 
+                            break;
+                        default:
+                            break;
+                    }
+                    return sLabRif;
                 }
                 else
                 {
@@ -1631,12 +1756,69 @@ namespace waCOVID
                         else if (dRiu >= (decimal)15)
                             tmpRis = "POSITIVO";
                         break;
+                    case "CORAGQ":
+                        if (dRiu < (decimal)1)
+                            tmpRis = "NEGATIVO";
+                        else if (dRiu >= (decimal) 1)
+                            tmpRis = "POSITIVO";
+                        break;
                 }
             }
             if (tmpRis == "")
                 MessageBox.Show("Vuoto");
             return tmpRis;
         }
+
+        private string GetRangeUM(string prmEsame, bool prmRange)
+        {
+            string tmpRange = "", tmpEsame;
+
+            tmpEsame = prmEsame.Substring(0, prmEsame.IndexOf(" "));
+            switch (tmpEsame)
+            {
+                case "COVG":
+                case "COVIG_5":
+                    tmpRange = prmRange ? "POSITIVO >=1.1 DUBBIO >=0.9 e <1.1 NEGATIVO < 0.9" : "AU/mL";
+                    break;
+                case "COVIG_3":
+                case "COVIGS_3":
+                    tmpRange = prmRange ? "POSITIVO >=1.1 DUBBIO >=0.9 e <1.1 NEGATIVO < 0.9" : "RATIO";
+                    break;
+                case "COVIDM":
+                    tmpRange = prmRange ? "POSITIVO >1.1 DUBBIO >=0.9 e <=1.1 NEGATIVO < 0.9" : "RATIO";
+                    break;
+                case "COVIG_2":
+                case "COVIGS_2":
+                    tmpRange = prmRange ? "POSITIVO >=1.1 DUBBIO >=0.8 e <1.1 NEGATIVO < 0.8" : "RATIO";
+                    break;
+                case "COVIDG":
+                case "COVIGA":
+                    tmpRange = prmRange ? "POSITIVO >1.1 DUBBIO >=0.8 e <=1.1 NEGATIVO < 0.8" : "RATIO";
+                    break;
+                case "COVM":
+                case "COVIGM":
+                case "COVIG_6":
+                    tmpRange = prmRange ? "POSITIVO >=1 NEGATIVO < 1" : "AU/mL";
+                    break;
+                case "COVT":
+                case "COVTG":
+                case "COVTGM":
+                case "COVR":
+                    tmpRange = prmRange ? "POSITIVO >=1 NEGATIVO < 1" : "COI";
+                    break;
+                case "COVIGG":
+                    tmpRange = prmRange ? "POSITIVO >=15 DUBBIO >=12 e <15 NEGATIVO < 12" : "AU/mL";
+                    break;
+                case "CORAGQ":
+                    tmpRange = prmRange ? "POSITIVO >=1 NEGATIVO < 1" : "COI";
+                    break;
+            }
+            if (tmpRange == "")
+                MessageBox.Show("Codice Esame Vuoto");
+
+            return tmpRange;
+        }
+
         private string GetCUR(enumTipoTracciato prmTipo, string prmEsame)
         {
             return GetCUR(prmTipo, prmEsame, false);
@@ -1684,6 +1866,7 @@ namespace waCOVID
                                 tmpCodCUR = "91.12.S";
                                 break;
                             case "COVRAG": //Test antigenico
+                            case "CORAGQ": //Test antigenico quantitativo
                                 tmpCodCUR = "91.13.M";
                                 break;
                             case "COVRAP": //Test rapido
@@ -1722,6 +1905,7 @@ namespace waCOVID
                                 tmpCodCUR = "C02238600";
                                 break;
                             case "COVRAG": //Tampone antigenico rapido
+                            case "CORAGQ": //Test antigenico quantitativo
                                 tmpCodCUR = "C02254000";
                                 break;
                             case "COVRAP": //Test rapido
@@ -1764,6 +1948,7 @@ namespace waCOVID
                                 tmpCodCUR = "3";
                                 break;
                             case "COVRAG": //Test Antigenico
+                            case "CORAGQ": //Test antigenico quantitativo
                                 tmpCodCUR = "4";
                                 break;
                             default: //Test CLIA O ELISA
@@ -1781,6 +1966,7 @@ namespace waCOVID
                 {
                     case "COVID": //Tampone
                     case "COVRAG": //Tampone
+                    case "CORAGQ": //Tampone
                         tmpCodCUR = enumTipoEsame.Tampone.ToString();
                         break;
                     case "COVRAP": //Test rapido
@@ -1997,8 +2183,8 @@ namespace waCOVID
                         //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
                         dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "descrStruttura", "idStruttura", "matrStruttura", "idAsr", "aslAppartenenza", "tipoRichiesta", "legalauthenticator",
-                            "id_aura", "codFisc", "cognome", "nome", "sesso", "dataDiNascita", "ComuneDiNascita", "Residenza", "indirizzoResidenza", "Domicilio", "indirizzoDomicilio", "id_documento",
-                            "code", "displayName", "effectiveTime", "esitoCode", "esitoDesc", "Unit", "Value", "ReferenceRange");
+                            "id_aura", "codFisc", "cognome", "nome", "sesso", "dataDiNascita", "comuneDiNascita", "Residenza", "IndirizzoResidenza", "Domicilio", "IndirizzoDomicilio", "id_documento",
+                            "code", "displayName", "effectiveTime", "esitoCode", "esitoDesc", "Unit", "Value", "ReferenceRange", "dataPrelievo");
                     }
                     break;
                 case enumTipoTracciato.LIGURIA:
@@ -2042,8 +2228,9 @@ namespace waCOVID
                         dv.RowFilter = " Esito<>'ANNULLATO' AND cognome<>'PROVA'";
                         //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
-                        dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "regione", "azienda", "laboratorio", "id", "provenienza", "tipo_provenienza", "reparto", "determinazione", "data", "cognome", "nome",
-                            "cf", "data_nascita", "genere", "comune", "comune_descrizione", "categoria", "qualifica", "esito_biomolecolare", "esito_immunologico");
+                        dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "regione", "azienda", "laboratorio", "id", "Provenienza", "Tipo Provenienza", "Reparto", "Determinazione", "Data prelievo", "Data determinazione",
+                            "Cognome", "Nome", "CF", "Comune nascita", "Data nascita", "Genere", "Comune domicilio", "Comune domicilio descrizione", "E-Mail", "Recapito telefonico", "Categoria", "Qualifica",
+                            "Esito_biomolecolare", "Esito_immunologico");
                     }
                     break;
                 case enumTipoTracciato.CAMPANIA:
@@ -2480,7 +2667,7 @@ namespace waCOVID
                                 //aStringBuilder.Insert(28, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(28, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(28, "20200050641001" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(28, "56308920201001" + Prog.ToString("000000")); //Selab
+                                //aStringBuilder.Insert(28, "56308920201201" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(28, "60580220200901" + Prog.ToString("000000")); //CMV
                                 //aStringBuilder.Insert(28, "20206421451001" + Prog.ToString("000000")); //Emolab
                                 if (tempLineValue.Substring(48, 2) == "99")
@@ -2500,8 +2687,8 @@ namespace waCOVID
                                 else
                                 {
                                     NEsaImp += 1;
-                                    if (NEsaImp > 9)
-                                        MessageBox.Show("Superato limite prestazioni alla riga: " + NRec.ToString());
+                                    //if (NEsaImp > 9)
+                                    //    MessageBox.Show("Superato limite prestazioni alla riga: " + NRec.ToString());
                                     Qt = int.Parse(tempLineValue.Substring(128, 3));
                                     if (Qt == 0)
                                         MessageBox.Show("Riscontrata anomalia Quantità esami=0 alla riga: " + NRec.ToString());
@@ -2517,7 +2704,7 @@ namespace waCOVID
                                 //aStringBuilder.Insert(25, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(25, "20200050641001" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(25, "56308920200801" + Prog.ToString("000000")); //Selab
+                                //aStringBuilder.Insert(25, "56308920201201" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(25, "60580220200901" + Prog.ToString("000000")); //CMV
                                 //aStringBuilder.Insert(25, "20206421451001" + Prog.ToString("000000")); //Emolab
 

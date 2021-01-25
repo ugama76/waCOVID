@@ -385,6 +385,7 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1062, 96);
             this.panel2.TabIndex = 21;
+            this.panel2.Visible = false;
             // 
             // label7
             // 
@@ -503,7 +504,7 @@
             this.txtStartProg.Name = "txtStartProg";
             this.txtStartProg.Size = new System.Drawing.Size(100, 22);
             this.txtStartProg.TabIndex = 21;
-            this.txtStartProg.Text = "6";
+            this.txtStartProg.Text = "1";
             // 
             // optSardegna
             // 
