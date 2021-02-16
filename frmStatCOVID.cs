@@ -37,7 +37,8 @@ namespace waCOVID
             PUGLIA_V2,
             PUGLIA_DENUNCE_COVID,
             PUGLIA_DENUNCE_ANTIGENICI,
-            VENETO
+            VENETO,
+            EMILIAMDL
         }
         private enum enumTipoEsame
         {
@@ -215,8 +216,31 @@ namespace waCOVID
                                                 //    dr["Setting"] = "Pri_citt";
                                                 //else
                                                 //dr["Setting"] = optTamponi.Checked ? "17_territoriale" : "Pri_citt"; //remmato per la delibera 37779 di novembre 2020
+                                                //Nuove indicazioni call del 12.02.2021
+                                                /*
+                                                 San Nicola
+                                                    Ditte che iniziano con ASST → 11_PZ_SSS
+                                                    per esclusione va utilizzato il 13_PZ_sin 
+                                                    tutta la MDL -> 15_Mcomp
+
+                                                    PP 667 COVID Tradate → 26_confermaAg tutti molecolari di conferma
+
+                                                    Antigenici
+                                                    Asintomatico/Screening se Positivo → 27_attesaconfAg
+
+                                                    PP MXP Stranieri → 25_rischioGeno
+                                                 */
                                                 if (optTamponi.Checked || optAntigenici.Checked)
-                                                    dr["Setting"] = "13_PZ_sin";
+                                                {
+                                                    if (dr["Reparto"].ToString().Contains("ASST"))
+                                                        dr["Setting"] = "11_PZ_SSS";
+                                                    else
+                                                        dr["Setting"] = "13_PZ_sin";
+                                                    if (dr["Punto Accesso"].ToString().Contains("MXP")) // Malpensa
+                                                        dr["Setting"] = "25_rischioGeno";
+                                                    else if (dr["Punto Accesso"].ToString().Contains("667 TRADATE COVID")) // Tamponi di conferma
+                                                        dr["Setting"] = "26_confermaAg";
+                                                }
                                                 else
                                                     dr["Setting"] = "6_Pri_citt ";
 
@@ -314,6 +338,49 @@ namespace waCOVID
                                         dr["dt_richiesta"] = dr["Data Accesso"];
                                         dr["dt_val"] = dr["Data Referto"];
                                         dr["cod_lab"] = "Lifebrain Emilia-Romagna S.r.l.";
+                                        if (dr["id_richiesta"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
+                                            dtCsv.Rows.Add(dr); //add other rows  
+                                    }
+                                    break;
+                                case enumTipoTracciato.EMILIAMDL:
+                                    if (i == 0)
+                                    {
+                                        for (int j = 0; j < rowValues.Count(); j++)
+                                        {
+                                            dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
+                                        }
+                                        dtCsv.Columns.Add("Esito"); //add other columns
+                                        dtCsv.Columns.Add("unità locale dell'azienda"); //add other columns
+                                        dtCsv.Columns.Add("Esito tampone antigenico (positivo/negativo)"); //add other columns
+                                        dtCsv.Columns.Add("Tampone molecolare a spese del datore di lavoro (SI/NO)"); //add other columns
+                                        dtCsv.Columns.Add("Esito Tampone molecolare a spese del datore di lavoro (positivo/negativo)"); //add other columns
+                                    }
+                                    else
+                                    {
+                                        DataRow dr = dtCsv.NewRow();
+                                        for (int k = 0; k < rowValues.Count(); k++)
+                                        {
+                                            dr[k] = rowValues[k].ToString().Trim();
+                                        }
+                                        tmpEsame = dr["Test_utilizzato"].ToString();
+                                        dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
+
+                                        switch (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")))
+                                        {
+
+                                            case "COVID":
+                                                dr["Esito Tampone molecolare a spese del datore di lavoro (positivo/negativo)"] = dr["Esito"];
+                                                break;
+                                            case "COVRAG":
+                                            case "CORAGQ":
+                                                dr["Esito tampone antigenico (positivo/negativo)"] = dr["Esito"];
+                                                break;
+                                        }
+                                        if (dr["Punto accesso"].ToString().ToUpper().Contains("MDL") || dr["Punto accesso"].ToString().ToUpper().Contains("SERVICE"))
+                                            dr["Tampone molecolare a spese del datore di lavoro (SI/NO)"] = "SI";
+                                        else
+                                            dr["Tampone molecolare a spese del datore di lavoro (SI/NO)"] = "NO";
+
                                         if (dr["id_richiesta"].ToString().Trim() != "") //16.06.2020 Esclude i preventivi
                                             dtCsv.Rows.Add(dr); //add other rows  
                                     }
@@ -1759,7 +1826,7 @@ namespace waCOVID
                     case "CORAGQ":
                         if (dRiu < (decimal)1)
                             tmpRis = "NEGATIVO";
-                        else if (dRiu >= (decimal) 1)
+                        else if (dRiu >= (decimal)1)
                             tmpRis = "POSITIVO";
                         break;
                 }
@@ -2143,13 +2210,27 @@ namespace waCOVID
                     }
                     break;
                 case enumTipoTracciato.EMILIA:
+                case enumTipoTracciato.EMILIAMDL:
                     if (chkFileEsteso.Checked == false)
                     {
-                        dv = dtDataTable.DefaultView;
-                        dv.RowFilter = "BCP='EMILIA ROMAGNA' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO' AND cognome<>'PROVA'";
-                        //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
+                        if (prmTipo == enumTipoTracciato.EMILIA)
+                        {
+                            dv = dtDataTable.DefaultView;
+                            dv.RowFilter = "BCP='EMILIA ROMAGNA' AND ESITO IN ('POSITIVO', 'DEBOLMENTE POSITIVO', 'DUBBIO') AND Esito<>'ANNULLATO' AND cognome<>'PROVA'";
+                            //dtDataTable = RemoveDuplicateRows(dv.ToTable(), "Codice Fiscale");
 
-                        dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "id_richiesta", "dt_richiesta", "cognome", "nome", "dt_nasc", "cod_fisc", "tel", "cod_test", "Igm_ris", "Igg_ris", "es_ris", "cod_lab", "dt_val", "mmg_mc", "Rif_mmg_mc", "dat_lavoro");
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "id_richiesta", "dt_richiesta", "cognome", "nome", "dt_nasc", "cod_fisc", "tel", "cod_test", "Igm_ris", "Igg_ris", "es_ris", "cod_lab", "dt_val", "mmg_mc", "Rif_mmg_mc", "dat_lavoro");
+                        }
+                        else
+                        {
+                            dv = dtDataTable.DefaultView;
+                            dv.RowFilter = " Esito<>'ANNULLATO' AND cognome<>'PROVA'";
+
+
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "Nome", "Cognome", "Data di nascita (gg/mm/aaaa)", "Codice Fiscale",
+                                "Email", "Telefono", "Residenza/domicilio", "ASL Assistenza", "unità locale dell'azienda", "Data esecuzione tampone(gg/mm/aaaa)",
+                                "Esito tampone antigenico (positivo/negativo)", "Tampone molecolare a spese del datore di lavoro (SI/NO)", "Esito Tampone molecolare a spese del datore di lavoro (positivo/negativo)");
+                        }
                     }
                     break;
                 case enumTipoTracciato.PARMA:
@@ -2355,7 +2436,12 @@ namespace waCOVID
             if (optPiacenza.Checked)
                 tmpTipo = enumTipoTracciato.AUSLPC;
             else if (optEmiliaRomagna.Checked)
-                tmpTipo = enumTipoTracciato.EMILIA;
+            {
+                if (lblFileOrigine.Text.IndexOf("COMDL") > -1)
+                    tmpTipo = enumTipoTracciato.EMILIAMDL;
+                else
+                    tmpTipo = enumTipoTracciato.EMILIA;
+            }
             else if (optPiemonte.Checked)
                 tmpTipo = enumTipoTracciato.PIEMONTE;
             else if (optParma.Checked)
@@ -2403,10 +2489,15 @@ namespace waCOVID
                         break;
 
                     case enumTipoTracciato.EMILIA:
-
                         WriteDtToCSV(tmpTipo, dt, Path.GetDirectoryName(Application.ExecutablePath)
                             + (chkFileEsteso.Checked ? "\\JLab ER Covid " : "\\AUSL ER Covid ")
                             + ".CSV");
+                        break;
+
+                    case enumTipoTracciato.EMILIAMDL:
+                        WriteDtToCSV(enumTipoTracciato.EMILIAMDL, dt, Path.GetDirectoryName(Application.ExecutablePath)
+                        + (chkFileEsteso.Checked ? "\\JLab ERMDL Covid " : "\\AUSL ERMDL Covid ")
+                        + ".CSV");
                         break;
 
                     case enumTipoTracciato.PARMA:
@@ -2569,7 +2660,7 @@ namespace waCOVID
             lblFileOrigine.Text = openFileDialog1.FileName;
             if (lblFileOrigine.Text.IndexOf("COPIA") > -1)
                 optPiacenza.Checked = true;
-            else if (lblFileOrigine.Text.IndexOf("COVEM") > -1)
+            else if (lblFileOrigine.Text.IndexOf("COVEM") > -1 || lblFileOrigine.Text.IndexOf("COMDL") > -1)
                 optEmiliaRomagna.Checked = true;
             else if (lblFileOrigine.Text.IndexOf("COPAR") > -1)
                 optParma.Checked = true;
@@ -2667,7 +2758,7 @@ namespace waCOVID
                                 //aStringBuilder.Insert(28, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(28, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(28, "20200050641001" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(28, "56308920201201" + Prog.ToString("000000")); //Selab
+                                //aStringBuilder.Insert(28, "56308920210101" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(28, "60580220200901" + Prog.ToString("000000")); //CMV
                                 //aStringBuilder.Insert(28, "20206421451001" + Prog.ToString("000000")); //Emolab
                                 if (tempLineValue.Substring(48, 2) == "99")
@@ -2704,7 +2795,7 @@ namespace waCOVID
                                 //aStringBuilder.Insert(25, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(25, "20200050641001" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(25, "56308920201201" + Prog.ToString("000000")); //Selab
+                                //aStringBuilder.Insert(25, "56308920210101" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(25, "60580220200901" + Prog.ToString("000000")); //CMV
                                 //aStringBuilder.Insert(25, "20206421451001" + Prog.ToString("000000")); //Emolab
 
