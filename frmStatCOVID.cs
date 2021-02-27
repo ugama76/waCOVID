@@ -163,7 +163,7 @@ namespace waCOVID
                                         else
                                         {
                                             tmpEsame = dr["Test_utilizzato"].ToString();
-                                            dr["ASST-Laboratorio"] = optTradate.Checked ? "ATS DELL'INSUBRIA" : "ATS DELLA VAL PADANA"; //add other columns
+                                            dr["ASST-Laboratorio"] = optTradate.Checked ? "ATS DELL'INSUBRIA" : "ATS DI BRESCIA"; //add other columns
                                             dr["Ente_richiedente"] = ""; //add other columns
                                             if (dr["Risultato"].ToString() == "" && dr["Data Referto"].ToString() == "")
                                             {
@@ -209,7 +209,7 @@ namespace waCOVID
                                                 if (optTradate.Checked) //Mail Nicoletta Fabucci del 18/11 
                                                     dr["Ospedale di Provenienza"] = "LIFEBRAIN LOMBARDIA SRL - TRADATE"; //16.11 post segnalazione report ATS
                                                 else
-                                                    dr["Ospedale di Provenienza"] = "LIFEBRAIN LOMBARDIA SRL - VIADANA"; //16.11 post segnalazione report ATS
+                                                    dr["Ospedale di Provenienza"] = "LIFEBRAIN LOMBARDIA SRL - BRESCIA"; //16.11 post segnalazione report ATS
 
                                                 //13.08 Remmato questo if inseguito ad indicazioni di Elena Frontini come mail di lunedì 10/08/2020 14:41
                                                 //if (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")) == "COVR") //come da mail Elena Frontini del 19.06
@@ -350,6 +350,7 @@ namespace waCOVID
                                             dtCsv.Columns.Add(rowValues[j].Trim()); //add headers  
                                         }
                                         dtCsv.Columns.Add("Esito"); //add other columns
+                                        dtCsv.Columns.Add("BCP"); //add other columns
                                         dtCsv.Columns.Add("unità locale dell'azienda"); //add other columns
                                         dtCsv.Columns.Add("Esito tampone antigenico (positivo/negativo)"); //add other columns
                                         dtCsv.Columns.Add("Tampone molecolare a spese del datore di lavoro (SI/NO)"); //add other columns
@@ -362,17 +363,23 @@ namespace waCOVID
                                         {
                                             dr[k] = rowValues[k].ToString().Trim();
                                         }
+                                        dr["BCP"] = GetLabRif(dr["Punto Accesso"].ToString()); //add other columns
                                         tmpEsame = dr["Test_utilizzato"].ToString();
-                                        dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                        
 
                                         switch (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")))
                                         {
 
                                             case "COVID":
+                                                dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
                                                 dr["Esito Tampone molecolare a spese del datore di lavoro (positivo/negativo)"] = dr["Esito"];
                                                 break;
                                             case "COVRAG":
+                                                dr["Esito"] = GetEsito(tmpEsame, dr["RisDesc"].ToString(), dr["CodRi"].ToString()); //add other columns
+                                                dr["Esito tampone antigenico (positivo/negativo)"] = dr["Esito"];
+                                                break;
                                             case "CORAGQ":
+                                                dr["Esito"] = GetEsito(tmpEsame, dr["Risultato"].ToString(), dr["CodRi"].ToString()); //add other columns
                                                 dr["Esito tampone antigenico (positivo/negativo)"] = dr["Esito"];
                                                 break;
                                         }
@@ -974,7 +981,6 @@ namespace waCOVID
                                         else
                                             new string(' ', 8);
 
-
                                         dr["Cognome"] = dr["cognome"].ToString().PadRight(30, ' ').Substring(0, 30);
                                         dr["Nome"] = dr["nome"].ToString().PadRight(20, ' ').Substring(0, 20);
                                         dr["CF"] = dr["CF"].ToString().PadRight(16, ' ');
@@ -1478,7 +1484,8 @@ namespace waCOVID
                 "AC1", "AC2", "AC3", "AC4", "AC5", "ES1", "ES2", "ES3", "ES4", "ES5", "ME1", "ME2", "ME3",
                 "ME4", "ME5", "ME6", "MN1", "MN2", "MN3", "MN4", "MN5", "MR1", "MR2", "MR3", "MR4", "MR5",
                 "RV1", "RV2", "RV3", "RV4", "RV5", "SM1", "SM2", "SM3", "SM4", "SM5", "CA1", "CA2", "CA3",
-                "CAR", "IV2", "IV3", "NV", "TE1", "TE2", "TE3", "TEC"
+                "CAR", "IV2", "IV3", "NV", "TE1", "TE2", "TE3", "TEC", "NV"
+
                 };
                 bool contains;
                 string tmpBCP = prmBCP.Substring(0, prmBCP.IndexOf(" ")).Trim();
@@ -1792,7 +1799,6 @@ namespace waCOVID
                     case "COVTG":
                     case "COVTGM":
                     case "COVR":
-                    case "COVIGM":
                     case "COVIG_6":
                         if (prmCodRis.Trim() != "")
                         {
@@ -1812,6 +1818,28 @@ namespace waCOVID
                             if (dRiu < (decimal)1)
                                 tmpRis = "NEGATIVO";
                             else if (dRiu >= (decimal)1)
+                                tmpRis = "POSITIVO";
+                        }
+                        break;
+                    case "COVIGM": //Modifica comununicata con mail di Luca del 25/02 (Tradate 05/02)
+                        if (prmCodRis.Trim() != "")
+                        {
+                            switch (prmCodRis)
+                            {
+                                case "NEG":
+                                case "MAG":
+                                    tmpRis = "NEGATIVO";
+                                    break;
+                                case "POS":
+                                    tmpRis = "POSITIVO";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if (dRiu < (decimal)1.1)
+                                tmpRis = "NEGATIVO";
+                            else if (dRiu >= (decimal)1.1)
                                 tmpRis = "POSITIVO";
                         }
                         break;
@@ -2224,10 +2252,10 @@ namespace waCOVID
                         else
                         {
                             dv = dtDataTable.DefaultView;
-                            dv.RowFilter = " Esito<>'ANNULLATO' AND cognome<>'PROVA'";
+                            dv.RowFilter = "BCP='EMILIA ROMAGNA' AND Esito<>'ANNULLATO' AND cognome<>'PROVA'";
 
 
-                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "Nome", "Cognome", "Data di nascita (gg/mm/aaaa)", "Codice Fiscale",
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "Nome", "Cognome", "Data di nascita (gg/mm/aaaa)", "Codice Fiscale", "Comune di Residenza", 
                                 "Email", "Telefono", "Residenza/domicilio", "ASL Assistenza", "unità locale dell'azienda", "Data esecuzione tampone(gg/mm/aaaa)",
                                 "Esito tampone antigenico (positivo/negativo)", "Tampone molecolare a spese del datore di lavoro (SI/NO)", "Esito Tampone molecolare a spese del datore di lavoro (positivo/negativo)");
                         }
