@@ -365,7 +365,7 @@ namespace waCOVID
                                         }
                                         dr["BCP"] = GetLabRif(dr["Punto Accesso"].ToString()); //add other columns
                                         tmpEsame = dr["Test_utilizzato"].ToString();
-                                        
+
 
                                         switch (tmpEsame.Substring(0, tmpEsame.IndexOf(" ")))
                                         {
@@ -941,20 +941,24 @@ namespace waCOVID
                                         tmpEsame = dr["Test_utilizzato"].ToString();
 
                                         dr["regione"] = "200";
-                                        dr["azienda"] = "201";
+                                        //dr["azienda"] = "201"; nota FILET.PDF del 26.02.2021
+
+                                        dr["azienda"] = GetLabRif(dr["BCP"].ToString(), true).ToString().PadRight(3, ' ');
                                         /*
-                                        LAB NUORO: 001601
-                                        LAO: 120140
-                                        TRC: 120130
-                                        LACS: 201301
-                                        LAB NORD: 027000
-                                        LAP: 028000
-                                        LAB VILLASIMIUS: 200454 
+                                        LAB NUORO: 001601 ASL Nuoro 104
+                                        LAO: 120140  ASL Olbia 103
+                                        TRC: 120130 ASL Olbia 103
+                                        LACS: 201301 ASL Sanluri 107
+                                        LAB NORD: 027000 ASL Sassari 101
+                                        LAP: 028000 ASL Sassari 101
+                                        LAB VILLASIMIUS: 200454 ASL Cagliari 108
                                          */
 
                                         //dr["laboratorio"] = "001737";
                                         //dr["laboratorio"] = "120140";
                                         dr["laboratorio"] = GetLabRif(dr["BCP"].ToString()).ToString().PadRight(6, ' ');
+
+
 
                                         dr["Provenienza"] = new string(' ', 8);
                                         //dr["tipo_provenienza"] = " ";
@@ -1465,7 +1469,7 @@ namespace waCOVID
             }
             return tmpATS;
         }
-        private string GetLabRif(string prmBCP)
+        private string GetLabRif(string prmBCP, bool prmASLRif)
         {
             if (prmBCP.Trim() != "")
             {
@@ -1499,6 +1503,16 @@ namespace waCOVID
                 }
                 else if (optSardegna.Checked)
                 {
+                    /*
+                    LAB NUORO: 001601 ASL Nuoro 103
+                    LAO: 120140  ASL Olbia 102
+                    TRC: 120130 ASL Olbia 102
+                    LACS: 201301 ASL Sanluri 106
+                    LAB NORD: 027000 ASL Sassari 101
+                    LAP: 028000 ASL Sassari 101
+                    LAB VILLASIMIUS: 200454 ASL Cagliari 108
+                     */
+
                     string sLabRif = "";
 
                     switch (tmpBCP)
@@ -1509,7 +1523,7 @@ namespace waCOVID
                         case "903":
                         case "904":
                         case "IV1":
-                            sLabRif = "001601"; //LAB NUORO: 
+                            sLabRif = prmASLRif ? "103" : "001601"; //LAB NUORO: 
                             break;
                         case "910":
                         case "911":
@@ -1519,7 +1533,7 @@ namespace waCOVID
                         case "915":
                         case "916":
                         case "IV4":
-                            sLabRif = "120130"; //TRC: 
+                            sLabRif = prmASLRif ? "102" : "120130"; //TRC: 
                             break;
                         case "920":
                         case "921":
@@ -1527,7 +1541,7 @@ namespace waCOVID
                         case "923":
                         case "924":
                         case "IV2":
-                            sLabRif = "201301"; //LACS: 
+                            sLabRif = prmASLRif ? "106" : "201301"; //LACS: 
                             break;
                         case "930":
                         case "931":
@@ -1536,7 +1550,7 @@ namespace waCOVID
                         case "934":
                         case "935":
                         case "IV5":
-                            sLabRif = "120140"; //LAO: 
+                            sLabRif = prmASLRif ? "102" : "120140"; //LAO: 
                             break;
                         case "940":
                         case "941":
@@ -1545,7 +1559,7 @@ namespace waCOVID
                         case "944":
                         case "945":
                         case "IV6":
-                            sLabRif = "200454"; //LAB VILLASIMIUS:  
+                            sLabRif = prmASLRif ? "108" : "200454"; //LAB VILLASIMIUS:  
                             break;
                         case "950":
                         case "951":
@@ -1554,7 +1568,7 @@ namespace waCOVID
                         case "954":
                         case "955":
                         case "IV7":
-                            sLabRif = "028000"; //LAP: 
+                            sLabRif = prmASLRif ? "101" : "028000"; //LAP: 
                             break;
                         case "960":
                         case "961":
@@ -1562,7 +1576,7 @@ namespace waCOVID
                         case "963":
                         case "964":
                         case "IV8":
-                            sLabRif = "027000"; //LAB NORD: 
+                            sLabRif = prmASLRif ? "101" : "027000"; //LAB NORD: 
                             break;
                         default:
                             break;
@@ -1635,6 +1649,10 @@ namespace waCOVID
             //}
             //return tmpRis;
             #endregion
+        }
+        private string GetLabRif(string prmBCP)
+        {
+            return GetLabRif(prmBCP, false);
         }
         private string GetEsito(string prmEsame, string prmRisultato, string prmCodRis)
         {
@@ -2255,7 +2273,7 @@ namespace waCOVID
                             dv.RowFilter = "BCP='EMILIA ROMAGNA' AND Esito<>'ANNULLATO' AND cognome<>'PROVA'";
 
 
-                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "Nome", "Cognome", "Data di nascita (gg/mm/aaaa)", "Codice Fiscale", "Comune di Residenza", 
+                            dtDataTable = dtDataTable.DefaultView.ToTable("Selected", false, "Nome", "Cognome", "Data di nascita (gg/mm/aaaa)", "Codice Fiscale", "Comune di Residenza",
                                 "Email", "Telefono", "Residenza/domicilio", "ASL Assistenza", "unità locale dell'azienda", "Data esecuzione tampone(gg/mm/aaaa)",
                                 "Esito tampone antigenico (positivo/negativo)", "Tampone molecolare a spese del datore di lavoro (SI/NO)", "Esito Tampone molecolare a spese del datore di lavoro (positivo/negativo)");
                         }
@@ -2782,11 +2800,11 @@ namespace waCOVID
                             if (lblFileOrigine.Text.IndexOf("SPS") > -1)
                             {
                                 NRec += 1;
-                                //aStringBuilder.Remove(28, 20);
+                                aStringBuilder.Remove(28, 20);
                                 //aStringBuilder.Insert(28, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(28, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(28, "20200050641001" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(28, "56308920210101" + Prog.ToString("000000")); //Selab
+                                aStringBuilder.Insert(28, "56308920210201" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(28, "60580220200901" + Prog.ToString("000000")); //CMV
                                 //aStringBuilder.Insert(28, "20206421451001" + Prog.ToString("000000")); //Emolab
                                 if (tempLineValue.Substring(48, 2) == "99")
@@ -2819,11 +2837,11 @@ namespace waCOVID
                             }
                             else if (lblFileOrigine.Text.IndexOf("SPA") > -1)
                             {
-                                //aStringBuilder.Remove(25, 20);
+                                aStringBuilder.Remove(25, 20);
                                 //aStringBuilder.Insert(25, "61115220201001" + Prog.ToString("000000")); //Biotest
                                 //aStringBuilder.Insert(25, "60830120200801" + Prog.ToString("000000")); //Citotest
                                 //aStringBuilder.Insert(25, "20200050641001" + Prog.ToString("000000")); //Fleming
-                                //aStringBuilder.Insert(25, "56308920210101" + Prog.ToString("000000")); //Selab
+                                aStringBuilder.Insert(25, "56308920210201" + Prog.ToString("000000")); //Selab
                                 //aStringBuilder.Insert(25, "60580220200901" + Prog.ToString("000000")); //CMV
                                 //aStringBuilder.Insert(25, "20206421451001" + Prog.ToString("000000")); //Emolab
 
